@@ -19,56 +19,55 @@ Y    [0, 1, 2, 3, 4, 5, 6, 7],
 accessing a tile:   board[Y][X] => piece
 """
 
-board = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-]
-
 def print_board(board):
     for row in board:
         for cell in row:
-            if cell == 0:
-                print(".", end=" ")
-            else:
-                print(cell, end=" ")
+            print(cell, end=" ")
         print()
 
 def add_piece(board, piece):
     board[piece.ypos][piece.xpos] = piece
 
-PW0 = Pawn(0, 0, 5, board)
-PW1 = Pawn(0, 1, 6, board)
-PW2 = Pawn(0, 2, 6, board)
-PW3 = Pawn(0, 3, 6, board)
-PW4 = Pawn(0, 4, 6, board)
-PW5 = Pawn(0, 5, 6, board)
-PW6 = Pawn(0, 6, 6, board)
-PW7 = Pawn(0, 7, 6, board)
+def piece_testbench(board,piece):
+    add_piece(board,piece)
+    print_board(board)
+    piece.find_poss_moves()
+    print(piece.poss_captures)
+    print(piece.poss_moves)
 
-PB0 = Pawn(1, 0, 1, board)
-#White pieces
+
+"""
+White pawns (from bottom)
+"""
+PW0 = Pawn(0, 0, 6, board)
 add_piece (board, PW0)
+
+PW1 = Pawn(0, 1, 6, board)
 add_piece (board, PW1)
+
+PW2 = Pawn(0, 2, 6, board)
 add_piece (board, PW2)
+
+PW3 = Pawn(0, 3, 6, board)
 add_piece (board, PW3)
+
+PW4 = Pawn(0, 4, 6, board)
 add_piece (board, PW4)
+
+PW5 = Pawn(0, 5, 6, board)
 add_piece (board, PW5)
+
+PW6 = Pawn(0, 6, 6, board)
 add_piece (board, PW6)
+PW7 = Pawn(0, 7, 6, board)
 add_piece (board, PW7)
 
-#Black pieces
+"""
+Black pawns (from top)
+"""
+PB0 = Pawn(1, 1, 4, board)
+PB0.has_moved = True
 add_piece (board,PB0)
-
-RW0 = Rook(0,4,0, board)
-
-add_piece (board,RW0)
-
 print_board(board)
-RW0.possible_moves()
-print(RW0.poss_moves)
+
+piece_testbench(board,PB0)
