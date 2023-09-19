@@ -120,11 +120,6 @@ class Rook(Piece):
                     self.poss_moves.append((x,y))
                 x -= 1
             
-            self.poss_moves = list(set(self.poss_moves))    #removes duplicates
-            self.poss_moves.remove((self.xpos,self.ypos))
-            self.poss_moves = [item for item in self.poss_moves if item not in self.poss_captures]
-
-            
         if self.color == 1:     #black
             x, y = self.xpos, self.ypos
             while y < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares south
@@ -164,9 +159,8 @@ class Rook(Piece):
                     self.poss_moves.append((x,y))
                 x -= 1
             
-            self.poss_moves = list(set(self.poss_moves))    #removes duplicates
-            self.poss_moves.remove((self.xpos,self.ypos))
-            self.poss_moves = [item for item in self.poss_moves if item not in self.poss_captures]
+        self.poss_moves = list(set(self.poss_moves))    #removes duplicates
+        self.poss_moves.remove((self.xpos,self.ypos))
 
 class Bishop(Piece):
     def __str__(self):  #string formatting
@@ -262,9 +256,212 @@ class Bishop(Piece):
                 x -= 1
                 y += 1
                 
-            self.poss_moves = list(set(self.poss_moves))    #removes duplicates
-            self.poss_moves.remove((self.xpos,self.ypos))
+        self.poss_moves = list(set(self.poss_moves))    #removes duplicates
+        self.poss_moves.remove((self.xpos,self.ypos))
         
+class Queen(Piece):
+    def __str__(self):
+        if self.color == 0:
+            return "QW"
+        elif self.color == 1:
+            return "QB"
+        
+    def find_poss_moves(self):
+        x,y = self.xpos,self.ypos
+        if (self.color == 0):       #white
+            
+            while (x < 8 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #northeast
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x += 1
+                y -= 1
+                
+            x,y = self.xpos,self.ypos
+            while (x >= 0 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):   #northwest   
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x -= 1
+                y -= 1
+                
+            x,y = self.xpos,self.ypos
+            while (x < 8 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southeast
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x += 1
+                y += 1
+
+            x,y = self.xpos,self.ypos
+            while (x >= 0 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southwest
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x -= 1
+                y += 1       
+                
+            x, y = self.xpos, self.ypos
+            while y < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares south
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                y += 1
+
+            y = self.ypos
+            while y >= 0 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares north
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                y -= 1
+
+            y = self.ypos
+            x = self.xpos
+            while x < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares east
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x += 1
+
+            x = self.xpos
+            while x >= 0 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares west
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x -= 1
+                
+        if self.color == 1: #black
+            
+            while (x < 8 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #northeast
+                if self.board[y][x].color == 0:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x += 1
+                y -= 1
+                
+            x,y = self.xpos,self.ypos
+            while (x >= 0 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):   #northwest   
+                if self.board[y][x].color == 0:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x -= 1
+                y -= 1
+                
+            x,y = self.xpos,self.ypos
+            while (x < 8 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southeast
+                if self.board[y][x].color == 0:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x += 1
+                y += 1
+
+            x,y = self.xpos,self.ypos
+            while (x >= 0 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southwest
+                if self.board[y][x].color == 0:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x -= 1
+                y += 1
+            
+            x, y = self.xpos, self.ypos
+            while y < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares south
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                y += 1
+
+            y = self.ypos
+            while y >= 0 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares north
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                y -= 1
+
+            y = self.ypos
+            x = self.xpos
+            while x < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares east
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                    break
+                x += 1
+
+            x = self.xpos
+            while x >= 0 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares west
+                if self.board[y][x].color == 1:
+                    self.poss_captures.append((x,y))
+                    break
+                else:
+                    self.poss_moves.append((x,y))
+                x -= 1
+                
+        self.poss_moves = list(set(self.poss_moves))    #removes duplicates
+        self.poss_moves.remove((self.xpos,self.ypos))
+            
+
+
+
+class King(Piece):
+    def __str__ (self):
+        if self.color == 0:
+            return (f"KW")
+        elif self.color == 1:
+            return (f"KB")
+    
+    def find_poss_moves(self):
+        x,y = self.xpos,self.ypos
+        temp_poss_moves = [(x+1,y),(x+1,y+1),(x,y+1),(x-1,y+1),(x-1,y),(x-1,y-1),(x,y-1),(x+1,y-1)]
+        
+        if self.color == 0:    
+            for coord in temp_poss_moves:
+                x,y = coord
+                if (x < 8 or x >= 0 or y < 8 or y >= 0):    #checking if in bounds
+                    if (self.board[y][x] == tile):
+                        self.poss_moves.append((x,y))
+                    if (self.board[y][x].color == 1):
+                        self.poss_captures.append((x,y))
+        if self.color == 1:
+            for coord in temp_poss_moves:
+                x,y = coord
+                if (x < 8 or x >= 0 or y < 8 or y >= 0):    #checking if in bounds
+                    if (self.board[y][x] == tile):
+                        self.poss_moves.append((x,y))
+                    if (self.board[y][x].color == 0):
+                        self.poss_captures.append((x,y))
+
+def inCheck(piece,board):  #a color moves a piece. Check if both black or white king is in check.
+    return False
+
 
 board = [
     [0, 0, 0, 0, 0, 0, 0, 0],

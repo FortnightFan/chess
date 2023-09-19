@@ -20,7 +20,7 @@ accessing a tile:   board[Y][X] => piece
 """
 
 def print_board(board):
-    print("   0  1  2  3  4  5  6  7")
+    print("    0  1  2  3  4  5  6  7")
     for i, row in enumerate(board):
         print(i, end="  ")
         for j in row:
@@ -76,7 +76,14 @@ BP2 = Pawn (1,3,5,board)
 BP3 = Pawn (1,3,3,board)
 add_piece (board, BP1)
 add_piece (board, BP3)
-BB0 = Bishop (1,5,5,board)
+
+"""
+Testing code
+"""
 
 
-piece_testbench(board,BB0)
+bishop = Bishop (1,5,5,board)
+queen = Queen(0,3,4,board)
+king = King(0,3,4,board)
+
+piece_testbench(board,king)
