@@ -112,7 +112,7 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
             move_piece(board, piece, piece.poss_captures[i])
             for row in range(0, 8):
                 for col in range(0, 8):
-                    if board[row][col].color == 1:
+                    if board[row][col].color == 0:
                         board[row][col].find_poss_moves()
                         if black_king_pos in board[row][col].poss_captures:
                             captures_to_remove.append(i)
@@ -122,6 +122,9 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
     # Remove the moves that should be removed
     for index in reversed(moves_to_remove):
         piece.poss_moves.pop(index)
+    if not captures_to_remove == []:
+        for index in reversed(captures_to_remove):
+            piece.poss_captures.pop(index)
     
 """
 White pieces (from bottom)
@@ -234,49 +237,30 @@ Testing notes:
     check_pin(board, PIECE) will modify pieces so they cannot move in a way that endangers the king piece. Always run this after PIECE.find_poss_moves.
 """
 
-
-# KB = King(1,3,0, board)
-# add_piece(board, KB)
-
-# KB.find_poss_moves()
-# check_pin(board, KB)
-# RW = Rook (0,0,1,board)
-# add_piece (board,RW)
-# piece_testbench(board,KB)
-
-# var = is_black_in_check(board)
-# print (var)
-
-# add_black_pieces()
-# add_white_pieces()
-
-# HW = Horse(0,2,7,board)
-# add_piece(board, HW)
-
-# HW.find_poss_moves()
-# piece_testbench(board, HW)
-
-KW = King(1,3,7,board)
-add_piece(board,KW)
-RW = Rook (1,3,4,board)
-add_piece(board, RW)
-
-RB = Rook(0,3,0,board)
-add_piece(board, RB)
-
-RW.find_poss_moves()
-check_pin(board, RW)
-piece_testbench(board, RW)
-
-
-
 """
-King poss moves:
-    Save initial position of the king.
-    Simulate every movement + capture of the king.
-        Update king_pos everytime.  
-    If the king is in check, remove the movement/capture from the list
-    If after simulating it, both lists are empty, checkmate :)
+Testbench notes:
+
+    Need testbench functions for:
+        is_black_in_check()
+        is_white_in_check()
+        check_pin()         << black and white conditions
+        is_checkmate()      << black and white conditions
     
-Fix pin logic so capturing a piece doesnt count as a move. 
+    Write expected output in comments, note any unexpected behavior
 """
+def white_pin_testbench():        #expected output: Black rook can only move in 3 col, or capture the rook.    
+    add_piece(board,King(1,3,0,board))
+    add_piece(board, Rook(0,3,7,board))
+    add_piece(board, Pawn (0,2,4,board))
+
+    RB = Rook (1,3,4,board)
+    add_piece(board, RB)
+
+    RB.find_poss_moves()
+
+    check_pin(board, RB)
+    piece_testbench(board, RB)
+
+    RB.clear_lists()
+
+white_pin_testbench()

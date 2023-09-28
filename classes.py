@@ -212,7 +212,7 @@ class Bishop(Piece):
                 x -= 1
                 y += 1
                 
-            self.poss_moves = list(set(self.poss_moves))    #removes duplicates
+            self.poss_moves = list(set(self.poss_moves))
             self.poss_moves.remove((self.xpos,self.ypos))
             
         elif (self.color == 1):     #black
@@ -256,7 +256,7 @@ class Bishop(Piece):
                 x -= 1
                 y += 1
                 
-        self.poss_moves = list(set(self.poss_moves))    #removes duplicates
+        self.poss_moves = list(set(self.poss_moves))    
         if (self.xpos,self.ypos) in self.poss_moves:
             self.poss_moves.remove((self.xpos,self.ypos))
         
@@ -269,7 +269,7 @@ class Queen(Piece):
         
     def find_poss_moves(self):
         x,y = self.xpos,self.ypos
-        if (self.color == 0):       #white
+        if (self.color == 0):      
             
             while (x < 8 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #northeast
                 if self.board[y][x].color == 1:
@@ -347,7 +347,7 @@ class Queen(Piece):
                     self.poss_moves.append((x,y))
                 x -= 1
                 
-        if self.color == 1: #black
+        if self.color == 1:
             
             while (x < 8 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #northeast
                 if self.board[y][x].color == 0:
@@ -426,7 +426,7 @@ class Queen(Piece):
                     self.poss_moves.append((x,y))
                 x -= 1
                 
-        self.poss_moves = list(set(self.poss_moves))    #removes duplicates
+        self.poss_moves = list(set(self.poss_moves))  
         self.poss_moves.remove((self.xpos,self.ypos))
             
 class King(Piece):
