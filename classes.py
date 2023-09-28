@@ -479,16 +479,13 @@ class Horse(Piece):
         if self.color == 1:
             for coord in temp_poss_moves:
                 x,y = coord
-                if (x < 8 or x >= 0 or y < 8 or y >= 0):    #checking if in bounds
+                if (x < 8 and x >= 0 and y < 8 and y >= 0):    #checking if in bounds
                     if (self.board[y][x] == tile):
                         self.poss_moves.append((x,y))
                     if (self.board[y][x].color == 0):
                         self.poss_captures.append((x,y))
                         
                         
-def inCheck(piece,board):  #a color moves a piece. Check if both black or white king is in check.
-    return False
-
 global board
 board = [
     [0, 0, 0, 0, 0, 0, 0, 0],
