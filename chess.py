@@ -1,5 +1,4 @@
 from classes import *
-
 """
 Pieces are represented by a letter
 
@@ -60,7 +59,30 @@ def is_white_in_check(board):  #returns a bool, True if in check.
                     return True
     return False
 
-def is_checkmate(board):    #returns a bool, True if checkmate
+def is_checkmate(board,king):    #returns a bool, True if checkmate
+    x,y = king.xpos,king.ypos
+    moves_to_remove = []
+    captures_to_remove = []
+    
+    for i in range(len(king.poss_moves)):
+        move_piece(board,king,king.poss_moves[i])
+        
+        for row in range(0,8):
+            for col in range(0,8):
+                if board[row][col].color == 1:
+                    board[row][col].find_poss_moves()
+                    if (king.xpos,king.ypos) in board[row][col].poss_captures:
+                        moves_to_remove.append(i)
+                    board[row][col].clear_lists()
+                move_piece(board,king, (x,y))
+                        
+        # Remove the moves that should be removed
+    for index in reversed(moves_to_remove):
+        king.poss_moves.pop(index)
+    if not captures_to_remove == []:
+        for index in reversed(captures_to_remove):
+            king.poss_captures.pop(index)
+    
     return 1
 
 def check_pin(board, piece):    #removes possible moves that will cause their own king to be checked. 
@@ -126,9 +148,6 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
         for index in reversed(captures_to_remove):
             piece.poss_captures.pop(index)
     
-"""
-White pieces (from bottom)
-"""
 def add_white_pieces():
     PW0 = Pawn(0, 0, 6, board)
     add_piece (board, PW0)
@@ -229,7 +248,7 @@ Testing notes:
     Before looking at a piece, always run PIECE.find_pos_moves().
     After testing a piece, always run PIECE.clear_lists().
     
-    To set up a board, declare the piece first. Reference the piece class in classes.py to set up parameters.
+    To set up a board, reference the piece class in classes.py to set up parameters.
     Use the add_piece(board, PIECE) function to update the global board variable.
     
     piece_testbench(board, PIECE) will print out the current board status, and print out all possible moves/captures of a certain piece. 
@@ -237,19 +256,8 @@ Testing notes:
     check_pin(board, PIECE) will modify pieces so they cannot move in a way that endangers the king piece. Always run this after PIECE.find_poss_moves.
 """
 
-"""
-Testbench notes:
-
-    Need testbench functions for:
-        is_black_in_check()
-        is_white_in_check()
-        check_pin()         << black and white conditions
-        is_checkmate()      << black and white conditions
-    
-    Write expected output in comments, note any unexpected behavior
-"""
 def white_pin_testbench():        #expected output: Black rook can only move in 3 col, or capture the rook.    
-    add_piece(board,King(1,3,0,board))
+    add_piece(board, King(1,3,0,board))
     add_piece(board, Rook(0,3,7,board))
     add_piece(board, Pawn (0,2,4,board))
 
@@ -263,4 +271,16 @@ def white_pin_testbench():        #expected output: Black rook can only move in 
 
     RB.clear_lists()
 
-white_pin_testbench()
+# white_pin_testbench()
+
+def king_moves_testbench():
+    KW = King(0,3,7,board)
+    
+    add_piece(board, Rook(1,2,0,board))
+    
+    add_piece(board,KW)
+    KW.find_poss_moves()
+    is_checkmate(board, KW)
+    piece_testbench(board, KW)
+
+king_moves_testbench()
