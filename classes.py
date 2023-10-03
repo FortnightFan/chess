@@ -1,3 +1,22 @@
+global board
+board = [
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]
+]
+global tile
+        
+global white_king_pos
+white_king_pos = (3,7)
+global black_king_pos
+black_king_pos = (3,0)
+
+
 class Piece:
     def __init__(self,color,xpos,ypos,board):
         self.color = color  # 0 = white, 1 = black, 2 = empty(blank tile)
@@ -486,25 +505,7 @@ class Horse(Piece):
                         self.poss_captures.append((x,y))
                         
                         
-global board
-board = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-]
-global tile
 tile = Tile(2,0,0,board)
 for i in range (0,8):
     for j in range (0,8):
         board[i][j] = tile
-        
-        
-global white_king_pos
-global black_king_pos
-white_king_pos = (3,7)
-black_king_pos = (3,0)

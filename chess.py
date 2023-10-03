@@ -1,4 +1,6 @@
 from classes import *
+
+
 """
 Pieces are represented by a letter
 
@@ -29,62 +31,77 @@ def print_board(board):         #prints status of the board to terminal.
 def add_piece(board, piece):        #adds piece to board. x,y coords are stored inside object
     board[piece.ypos][piece.xpos] = piece
 
-def move_piece (board, piece, pos): #move a piece to a given tuple (pos).
-    x,y = piece.xpos,piece.ypos
-    piece.xpos,piece.ypos = pos[0],pos[1]
+def move_piece(board, piece, pos):  #moves a piece to tuple pos
+    global white_king_pos, black_king_pos
+
+    x, y = piece.xpos, piece.ypos
+    piece.xpos, piece.ypos = pos[0], pos[1]
     add_piece(board, piece)
     board[y][x] = tile
+    if isinstance(piece, King):
+        if piece.color == 0:
+            white_king_pos = (piece.xpos, piece.ypos)
+        elif piece.color == 1:
+            black_king_pos = (piece.xpos, piece.ypos)
 
+def find_all_poss_moves(board):
+    for row in range (0,8):
+        for col in range (0,8):
+            board[col][row].find_poss_moves()
+
+def clear_all_lists():
+    for row in range(0,8):
+        for col in range(0,8):
+            board[row][col].clear_lists()
+            
 def piece_testbench(board,piece):       #adds a given piece to the board at location. Board is printed, and possible captures and moves are printed out
     add_piece(board,piece)
     print_board(board)
     print(piece.poss_captures)
     print(piece.poss_moves)
 
-def is_black_in_check(board):  #returns a bool, True if in check. 
-    for row in range(0, 8):
-        for col in range(0, 8):
-            if board[row][col].color == 0:
-                board[row][col].find_poss_moves()
-                if black_king_pos in board[row][col].poss_captures:
-                    return True
-    return False
-
-def is_white_in_check(board):  #returns a bool, True if in check. 
-    for row in range(0, 8):
-        for col in range(0, 8):
-            if board[row][col].color == 1:
-                board[row][col].find_poss_moves()
-                if white_king_pos in board[row][col].poss_captures:
-                    return True
-    return False
-
-def is_checkmate(board,king):    #returns a bool, True if checkmate
+def legal_king_moves(board,king):      #removes illegal king moves
     x,y = king.xpos,king.ypos
     moves_to_remove = []
     captures_to_remove = []
     
-    for i in range(len(king.poss_moves)):
-        move_piece(board,king,king.poss_moves[i])
-        
-        for row in range(0,8):
-            for col in range(0,8):
-                if board[row][col].color == 1:
-                    board[row][col].find_poss_moves()
-                    if (king.xpos,king.ypos) in board[row][col].poss_captures:
-                        moves_to_remove.append(i)
-                    board[row][col].clear_lists()
-                move_piece(board,king, (x,y))
-                        
-        # Remove the moves that should be removed
+    if (king.color == 0):
+        for i in range(len(king.poss_moves)):
+            move_piece(board,king,king.poss_moves[i])
+            if (is_white_in_check(board) == True):
+                moves_to_remove.append(i)
+            move_piece(board,king, (x,y))
+            
+        for i in range(len(king.poss_captures)):
+            temp = board[king.poss_captures[i][1]][king.poss_captures[i][0]]
+            move_piece(board, king, king.poss_captures[i])
+            if (is_white_in_check(board) == True):
+                captures_to_remove.append(i)     
+            move_piece(board, king, (x, y))
+            add_piece (board, temp)            
+
+    elif (king.color == 1):
+        for i in range(len(king.poss_moves)):
+            move_piece(board,king,king.poss_moves[i])
+            if (is_black_in_check(board) == True):
+                moves_to_remove.append(i)
+            move_piece(board,king, (x,y))
+
+        for i in range(len(king.poss_captures)):
+            temp = board[king.poss_captures[i][1]][king.poss_captures[i][0]]
+            move_piece(board, king, king.poss_captures[i])
+            if (is_black_in_check(board) == True):
+                captures_to_remove.append(i)     
+            move_piece(board, king, (x, y))
+            add_piece (board, temp)    
+                            
     for index in reversed(moves_to_remove):
-        king.poss_moves.pop(index)
+            king.poss_moves.pop(index)
     if not captures_to_remove == []:
         for index in reversed(captures_to_remove):
             king.poss_captures.pop(index)
-    
-    return 1
-
+                
+                
 def check_pin(board, piece):    #removes possible moves that will cause their own king to be checked. 
     x, y = piece.xpos, piece.ypos
     
@@ -93,7 +110,6 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
     if (piece.color == 0):
         for i in range(len(piece.poss_moves)):
             move_piece(board, piece, piece.poss_moves[i])
-            
             for row in range(0, 8):
                 for col in range(0, 8):
                     if board[row][col].color == 1:
@@ -141,12 +157,114 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
                         board[row][col].clear_lists()        
             move_piece(board, piece, (x, y))
             add_piece (board, temp)
-    # Remove the moves that should be removed
+
     for index in reversed(moves_to_remove):
         piece.poss_moves.pop(index)
     if not captures_to_remove == []:
         for index in reversed(captures_to_remove):
             piece.poss_captures.pop(index)
+        
+"""
+Functions for when king is in check-state
+"""    
+def is_black_in_check(board):  #returns a bool, True if in check. 
+    for row in range(0, 8):
+        for col in range(0, 8):
+            if board[row][col].color == 0:
+                board[row][col].find_poss_moves()
+                if black_king_pos in board[row][col].poss_captures:
+                    board[row][col].clear_lists()
+                    return True
+                board[row][col].clear_lists()
+    return False
+
+def is_white_in_check(board):  #returns a bool, True if in check. 
+    for row in range(0, 8):
+        for col in range(0, 8):
+            if board[row][col].color == 1:
+                board[row][col].find_poss_moves()
+                if white_king_pos in board[row][col].poss_captures:
+                    board[row][col].clear_lists()
+                    return True
+                board[row][col].clear_lists()
+    return False
+
+def can_white_block(board): #called when white is in check. Corrects piece moves so they have to protect king
+    moves_to_remove = []
+    captures_to_remove = []
+    for row in range(0,8):
+        for col in range(0,8):
+            if board[row][col].color == 0 and not(isinstance(board[row][col], King)):
+                piece = board[row][col]
+                piece.find_poss_moves()
+                for i in range (len(piece.poss_moves)):
+                    move_piece(board, piece, piece.poss_moves[i])
+                    if is_white_in_check(board) == True:
+                        moves_to_remove.append(i)
+                    move_piece(board, piece, (col,row))
+                for index in reversed(moves_to_remove):
+                    piece.poss_moves.pop(index)
+                moves_to_remove = []
+    for row in range(0,8):
+        for col in range(0,8):
+            if board[row][col].color == 0 and not(isinstance(board[row][col], King)):
+                piece = board[row][col]
+                for i in range (len(piece.poss_captures)):
+                    temp = board[piece.poss_captures[i][1]][piece.poss_captures[i][0]]
+                    move_piece(board, piece, piece.poss_captures[i])
+                    if is_white_in_check(board) == True:
+                        captures_to_remove.append(i)
+                    move_piece(board, piece, (col,row))
+                    add_piece(board, temp)
+                if not captures_to_remove == []:
+                    for index in reversed(captures_to_remove):
+                        piece.poss_captures.pop(index)
+                captures_to_remove = []
+                
+def can_black_block(board): #called when black is in check. Corrects piece moves so they have to protect king
+    moves_to_remove = []
+    captures_to_remove = []
+    for row in range(0,8):
+        for col in range(0,8):
+            if board[row][col].color == 1 and not(isinstance(board[row][col], King)):
+                piece = board[row][col]
+                piece.find_poss_moves()
+                for i in range (len(piece.poss_moves)):
+                    move_piece(board, piece, piece.poss_moves[i])
+                    if is_black_in_check(board) == True:
+                        moves_to_remove.append(i)
+                    move_piece(board, piece, (col,row))
+                for index in reversed(moves_to_remove):
+                    piece.poss_moves.pop(index)
+                moves_to_remove = []
+    for row in range(0,8):
+        for col in range(0,8):
+            if board[row][col].color == 1 and not(isinstance(board[row][col], King)):
+                piece = board[row][col]
+                for i in range (len(piece.poss_captures)):
+                    temp = board[piece.poss_captures[i][1]][piece.poss_captures[i][0]]
+                    move_piece(board, piece, piece.poss_captures[i])
+                    if is_black_in_check(board) == True:
+                        captures_to_remove.append(i)
+                    move_piece(board, piece, (col,row))
+                    add_piece(board, temp)
+                if not captures_to_remove == []:
+                    for index in reversed(captures_to_remove):
+                        piece.poss_captures.pop(index)
+                captures_to_remove = []
+"""
+Testing notes:
+
+    Before looking at a piece, always run find_all_poss_moves().
+    After testing a piece, always run clear_all_lists().
+    
+    To set up a board, reference the piece class in classes.py to set up parameters.
+    Use the add_piece(board, PIECE) function to update the global board variable.
+    
+    piece_testbench(board, PIECE) will print out the current board status, and print out all possible moves/captures of a certain piece. 
+    
+    check_pin(board, PIECE) will modify pieces so they cannot move in a way that endangers the king piece. Always run this after PIECE.find_poss_moves.
+"""
     
 def add_white_pieces():
     PW0 = Pawn(0, 0, 6, board)
@@ -242,20 +360,6 @@ def add_black_pieces():
     HW2 = Horse (1,5,0, board)
     add_piece (board, HW2)
 
-"""
-Testing notes:
-
-    Before looking at a piece, always run PIECE.find_pos_moves().
-    After testing a piece, always run PIECE.clear_lists().
-    
-    To set up a board, reference the piece class in classes.py to set up parameters.
-    Use the add_piece(board, PIECE) function to update the global board variable.
-    
-    piece_testbench(board, PIECE) will print out the current board status, and print out all possible moves/captures of a certain piece. 
-    
-    check_pin(board, PIECE) will modify pieces so they cannot move in a way that endangers the king piece. Always run this after PIECE.find_poss_moves.
-"""
-
 def white_pin_testbench():        #expected output: Black rook can only move in 3 col, or capture the rook.    
     add_piece(board, King(1,3,0,board))
     add_piece(board, Rook(0,3,7,board))
@@ -264,23 +368,11 @@ def white_pin_testbench():        #expected output: Black rook can only move in 
     RB = Rook (1,3,4,board)
     add_piece(board, RB)
 
-    RB.find_poss_moves()
+    find_all_poss_moves()
 
     check_pin(board, RB)
     piece_testbench(board, RB)
 
-    RB.clear_lists()
+    clear_all_lists()
 
-# white_pin_testbench()
-
-def king_moves_testbench():
-    KW = King(0,3,7,board)
-    
-    add_piece(board, Rook(1,2,0,board))
-    
-    add_piece(board,KW)
-    KW.find_poss_moves()
-    is_checkmate(board, KW)
-    piece_testbench(board, KW)
-
-king_moves_testbench()
+#white_pin_testbench()
