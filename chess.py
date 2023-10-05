@@ -360,19 +360,20 @@ def add_black_pieces():
     HW2 = Horse (1,5,0, board)
     add_piece (board, HW2)
 
-def white_pin_testbench():        #expected output: Black rook can only move in 3 col, or capture the rook.    
-    add_piece(board, King(1,3,0,board))
-    add_piece(board, Rook(0,3,7,board))
-    add_piece(board, Pawn (0,2,4,board))
+# ADDED TO testbenches.py
+# def white_pin_testbench():        #expected output: Black rook can only move in 3 col, or capture the rook.    
+#     add_piece(board, King(1,3,0,board))
+#     add_piece(board, Rook(0,3,7,board))
+#     add_piece(board, Pawn (0,2,4,board))
 
-    RB = Rook (1,3,4,board)
-    add_piece(board, RB)
+#     RB = Rook (1,3,4,board)
+#     add_piece(board, RB)
 
-    find_all_poss_moves()
+#     find_all_poss_moves()
 
-    check_pin(board, RB)
-    piece_testbench(board, RB)
+#     check_pin(board, RB)
+#     piece_testbench(board, RB)
 
-    clear_all_lists()
+#     clear_all_lists()
 
 #white_pin_testbench()
