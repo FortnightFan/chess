@@ -49,7 +49,7 @@ def find_all_poss_moves(board):
         for col in range (0,8):
             board[col][row].find_poss_moves()
 
-def clear_all_lists():
+def clear_all_lists(board):
     for row in range(0,8):
         for col in range(0,8):
             board[row][col].clear_lists()
@@ -190,6 +190,7 @@ def is_white_in_check(board):  #returns a bool, True if in check.
     return False
 
 def can_white_block(board): #called when white is in check. Corrects piece moves so they have to protect king
+    return_val = False
     moves_to_remove = []
     captures_to_remove = []
     for row in range(0,8):
@@ -201,6 +202,7 @@ def can_white_block(board): #called when white is in check. Corrects piece moves
                     move_piece(board, piece, piece.poss_moves[i])
                     if is_white_in_check(board) == True:
                         moves_to_remove.append(i)
+                        return_val = True
                     move_piece(board, piece, (col,row))
                 for index in reversed(moves_to_remove):
                     piece.poss_moves.pop(index)
@@ -214,14 +216,16 @@ def can_white_block(board): #called when white is in check. Corrects piece moves
                     move_piece(board, piece, piece.poss_captures[i])
                     if is_white_in_check(board) == True:
                         captures_to_remove.append(i)
+                        return_val = True
                     move_piece(board, piece, (col,row))
                     add_piece(board, temp)
                 if not captures_to_remove == []:
                     for index in reversed(captures_to_remove):
                         piece.poss_captures.pop(index)
                 captures_to_remove = []
+    return return_val
                 
-def can_black_block(board): #called when black is in check. Corrects piece moves so they have to protect king
+def can_black_block(board): #called when black is in check. Corrects piece moves so they have to protect king. Returns true/false if there's a move to protect
     moves_to_remove = []
     captures_to_remove = []
     for row in range(0,8):
@@ -252,6 +256,25 @@ def can_black_block(board): #called when black is in check. Corrects piece moves
                     for index in reversed(captures_to_remove):
                         piece.poss_captures.pop(index)
                 captures_to_remove = []
+    return False            
+    
+def is_white_checkmate(board):
+    if is_white_in_check(board) == True:
+        king = board[white_king_pos[1]][white_king_pos[0]]
+        king.find_poss_moves()
+        legal_king_moves(board, king)
+        if king.poss_moves == [] and king.poss_captures == [] and not(can_white_block(board)):
+            return True
+    return False
+
+def is_black_checkmate(board):
+    if is_black_in_check(board) == True:
+        king = board[black_king_pos[1]][black_king_pos[0]]
+        king.find_poss_moves()
+        legal_king_moves(board, king)
+        if king.poss_moves == [] and king.poss_captures == [] and not(can_black_block(board)):
+            return True
+    return False
 """
 Testing notes:
 
@@ -360,19 +383,14 @@ def add_black_pieces():
     HW2 = Horse (1,5,0, board)
     add_piece (board, HW2)
 
-def white_pin_testbench():        #expected output: Black rook can only move in 3 col, or capture the rook.    
-    add_piece(board, King(1,3,0,board))
-    add_piece(board, Rook(0,3,7,board))
-    add_piece(board, Pawn (0,2,4,board))
-
-    RB = Rook (1,3,4,board)
-    add_piece(board, RB)
-
-    find_all_poss_moves()
-
-    check_pin(board, RB)
-    piece_testbench(board, RB)
-
-    clear_all_lists()
-
-#white_pin_testbench()
+def init(board):
+    global white_king_pos, black_king_pos
+    for row in range(0,8):
+        for col in range(0,8):
+            piece = board[row][col]
+            if isinstance(piece, King):
+                if piece.color == 0:
+                    white_king_pos = (piece.xpos,piece.ypos)
+                elif piece.color == 1:
+                    black_king_pos = (piece.xpos,piece.ypos)
+                    

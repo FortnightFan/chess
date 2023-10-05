@@ -39,6 +39,12 @@ class Tile (Piece):
         return (f"__")
 
 class Pawn(Piece):
+    def __init__(self,color,xpos,ypos,board, has_moved):
+        super().__init__(color,xpos,ypos,board)
+        self.has_moved = has_moved
+        self.poss_moves = []
+        self.poss_captures = []        
+    
     def __str__(self):  #string formatting
         if self.color == 0:
             return (f"PW")
@@ -94,6 +100,12 @@ class Pawn(Piece):
         self.poss_captures = []
 
 class Rook(Piece):
+    def __init__(self,color,xpos,ypos,board, has_moved):
+        super().__init__(color,xpos,ypos,board)
+        self.has_moved = has_moved
+        self.poss_moves = []
+        self.poss_captures = []      
+
     def __str__(self):  #string formatting
         if self.color == 0:
             return (f"RW")
@@ -449,6 +461,12 @@ class Queen(Piece):
         self.poss_moves.remove((self.xpos,self.ypos))
             
 class King(Piece):
+    def __init__(self,color,xpos,ypos,board, has_moved):
+        super().__init__(color,xpos,ypos,board)
+        self.has_moved = has_moved
+        self.poss_moves = []
+        self.poss_captures = []      
+
     def __str__ (self):
         if self.color == 0:
             return (f"KW")
