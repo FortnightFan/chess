@@ -32,18 +32,11 @@ def clear_board(): #call to clear board
     [0, 0, 0, 0, 0, 0, 0, 0]
     ]
     global tile
-
-    class Tile (Piece):
-        def __str__ (self):
-            return (f"__")
-
-    tile = Tile(2,0,0,board)
     for i in range (0,8):
         for j in range (0,8):
             board[i][j] = tile
 
 def white_rook_pin_testbench(): #expected output: Black rook can only move in 3 col, or capture the rook.    
-    init(board)
     add_piece(board, King(1,3,0,board, 0))  #adds piece to board with x,y coords
     add_piece(board, Rook(0,3,7,board, 0))  #adds piece to board with x,y coords
     add_piece(board, Pawn(0,2,4,board, 0))  #adds piece to board with x,y coords
@@ -78,7 +71,6 @@ def white_rook_diff_initial_pin_testbench(): #expected output: Black rook can on
     clear_board()
 
 def black_rook_pin_testbench(): #expected output: White rook can only move in col 3, or capture white rook
-
     add_piece(board, King(0,3,0,board, 0))
     add_piece(board, Rook(1,3,7,board, 0))
     add_piece(board, Pawn(1,2,4,board, 0))
@@ -86,6 +78,7 @@ def black_rook_pin_testbench(): #expected output: White rook can only move in co
     RW = Rook(0,3,4,board, 0)
     add_piece(board, RW)
 
+    init(board)
     find_all_poss_moves(board)
 
     check_pin(board, RW)
