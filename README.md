@@ -24,6 +24,8 @@ Game Logic Functions:
 	
 	init() : Corrects king position. Call this after adding all the needed pieces. 
 
+  	can_black/white_castle()  : Returns True if the king can correctly castle. False otherwise. 
+
 Check Logic Functions
 
 	is_black_in_check(board)/is_white_in_check : Returns a bool that states True if black/white is in check, or False otherwise.
