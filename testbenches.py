@@ -175,7 +175,7 @@ def black_bishop_pin_testbench(): #expected output: WB can only move diagonally 
     clear_all_lists(board)
     clear_board()
 
-def black_biship_diff_initial_pin_testbench(): #expected output: WB can only move diagonally between BB and KW, or capture BB
+def black_bishop_diff_initial_pin_testbench(): #expected output: WB can only move diagonally between BB and KW, or capture BB
     add_piece(board, King(0,1,1,board, 0))  #adds piece to board with x,y coords
     add_piece(board, Bishop(1,6,6,board))  #adds piece to board with x,y coords
     add_piece(board, Pawn(1,6,4,board, 0))  #adds piece to board with x,y coords
@@ -207,6 +207,6 @@ white_bishop_diff_initial_pin_testbench()
 print("\nWHITE BISHOP TEST")
 black_bishop_pin_testbench()
 print("\nWHITE BISHOP DIFFERENT INITIAL LOCATION TEST")
-black_biship_diff_initial_pin_testbench()
+black_bishop_diff_initial_pin_testbench()
 
 
