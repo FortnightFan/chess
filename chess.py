@@ -36,14 +36,22 @@ def move_piece(board, piece, pos):  #moves a piece to tuple pos
 
     x, y = piece.xpos, piece.ypos
     piece.xpos, piece.ypos = pos[0], pos[1]
+    
+    if board[pos[1]][pos[0]] != Tile:
+        ret_val = board[pos[1]][pos[0]]
+    
     add_piece(board, piece)
     board[y][x] = tile
     if isinstance(piece, King):
+        piece.has_moved == True
         if piece.color == 0:
             white_king_pos = (piece.xpos, piece.ypos)
         elif piece.color == 1:
             black_king_pos = (piece.xpos, piece.ypos)
-
+    elif isinstance(piece,Pawn) or isinstance(piece,Rook):
+        piece.has_moved == True
+    
+    return ret_val
 def find_all_poss_moves(board):
     for row in range (0,8):
         for col in range (0,8):
@@ -164,6 +172,27 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
         for index in reversed(captures_to_remove):
             piece.poss_captures.pop(index)
         
+def can_white_castle(board):    #returns a bool that is true if the white king can castle
+    king = board[white_king_pos[1]][white_king_pos[0]]
+    if king.has_moved == True:
+        return False
+    else:   #check short side
+        if (board[7][2] == Tile and board[7][1] == Tile and isinstance(board[7][0], Rook)):
+            if (board[7][0].has_moved == False):
+                rook = move_piece(board, king, (0,7))
+                move_piece(board, rook, (3,7))
+                return True
+        return False
+
+def can_black_castle(board):    #returns a bool that is true if the black king can castle
+    king = board[black_king_pos[1]][black_king_pos[0]]    
+    if king.has_moved == True:
+        return False
+    else:   #check short side
+        if (board[0][2] == Tile and board[0][1] == Tile and isinstance(board[0][0], Rook)):
+            if (board[0][0].has_moved == False):
+                return True
+        return False
 """
 Functions for when king is in check-state
 """    
