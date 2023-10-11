@@ -12,9 +12,9 @@ board = [
 global tile
         
 global white_king_pos
-white_king_pos = (3,7)
+white_king_pos = (4,7)
 global black_king_pos
-black_king_pos = (3,0)
+black_king_pos = (4,0)
 
 
 class Piece:
@@ -466,14 +466,45 @@ class King(Piece):
         self.has_moved = has_moved
         self.poss_moves = []
         self.poss_captures = []      
+        self.can_castle_short = False
+        self.can_castle_long = False
 
     def __str__ (self):
         if self.color == 0:
             return (f"KW")
         elif self.color == 1:
             return (f"KB")
-    
+ 
+    def can_king_castle(self):
+        if self.has_moved == True:
+            self.can_castle_short = False
+            self.can_castle_long = False
+        else:
+            if self.color == 0:
+                if (board[7][5] == tile and board[7][6] == tile and isinstance(board[7][7], Rook)):
+                    if (board[7][7].has_moved == False):
+                        self.can_castle_short = True
+                    else:
+                        self.can_castle_short = False
+                if (board[7][1] == tile and board[7][2] == tile and board[7][3] == tile and isinstance(board[7][0], Rook)):
+                    if (board[7][0].has_moved == False):
+                        self.can_castle_long = True
+                    else:
+                        self.can_castle_long = False
+            elif self.color == 1:
+                if (board[0][5] == tile and board[0][6] == tile and isinstance(board[0][7], Rook)):
+                    if (board[0][7].has_moved == False):
+                        self.can_castle_short = True
+                    else:
+                        self.can_castle_short = False
+                if (board[0][1] == tile and board[0][2] == tile and board[0][3] == tile and isinstance(board[0][0], Rook)):
+                    if (board[0][0].has_moved == False):
+                        self.can_castle_long = True
+                    else:
+                        self.can_castle_long = False
+
     def find_poss_moves(self):
+        self.can_king_castle()
         x,y = self.xpos,self.ypos
         temp_poss_moves = [(x+1,y),(x+1,y+1),(x,y+1),(x-1,y+1),(x-1,y),(x-1,y-1),(x,y-1),(x+1,y-1)]
         
@@ -493,7 +524,7 @@ class King(Piece):
                         self.poss_moves.append((x,y))
                     if (self.board[y][x].color == 0):
                         self.poss_captures.append((x,y))
-
+                    
 class Horse(Piece):
     def __str__ (self):
         if self.color == 0:

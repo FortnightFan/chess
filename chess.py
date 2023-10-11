@@ -172,27 +172,23 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
         for index in reversed(captures_to_remove):
             piece.poss_captures.pop(index)
         
-def can_white_castle(board):    #returns a bool that is true if the white king can castle
-    king = board[white_king_pos[1]][white_king_pos[0]]
-    if king.has_moved == True:
-        return False
-    else:   #check short side
-        if (board[7][2] == Tile and board[7][1] == Tile and isinstance(board[7][0], Rook)):
-            if (board[7][0].has_moved == False):
-                rook = move_piece(board, king, (0,7))
-                move_piece(board, rook, (3,7))
-                return True
-        return False
+def can_king_castle(board, king):
+    if king.color == 0:
+        if king.can_castle_short == True:
+            move_piece(board, king, (2,7))
+            if is_white_in_check(board):
+                return False
+            move_piece(board, king, (1,7))
+            if is_white_in_check(board):
+                return False
+        elif king.can_castle_long == True:
+            return 1
+    elif king.color == 1:
+        if king.can_castle_short == True:
+            return 1
+        elif king.can_castle_long == True:
+            return 1       
 
-def can_black_castle(board):    #returns a bool that is true if the black king can castle
-    king = board[black_king_pos[1]][black_king_pos[0]]    
-    if king.has_moved == True:
-        return False
-    else:   #check short side
-        if (board[0][2] == Tile and board[0][1] == Tile and isinstance(board[0][0], Rook)):
-            if (board[0][0].has_moved == False):
-                return True
-        return False
 """
 Functions for when king is in check-state
 """    
@@ -353,10 +349,10 @@ def add_white_pieces():
     add_piece (board, BW1)
     add_piece (board, BW2)
     
-    KW = King (0,3,7, board)
+    KW = King (0,4,7, board)
     add_piece (board, KW)
     
-    QW = Queen (0,4,7, board)
+    QW = Queen (0,3,7, board)
     add_piece (board, QW)
     
     HW1 = Horse (0,2,7, board)
@@ -400,10 +396,10 @@ def add_black_pieces():
     add_piece (board, BW1)
     add_piece (board, BW2)
     
-    KW = King (1,3,0, board)
+    KW = King (1,4,0, board)
     add_piece (board, KW)
     
-    QW = Queen (1,4,0, board)
+    QW = Queen (1,3,0, board)
     add_piece (board, QW)
     
     HW1 = Horse (1,2,0, board)
@@ -422,4 +418,3 @@ def init(board):
                     white_king_pos = (piece.xpos,piece.ypos)
                 elif piece.color == 1:
                     black_king_pos = (piece.xpos,piece.ypos)
-                    
