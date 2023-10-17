@@ -173,21 +173,38 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
             piece.poss_captures.pop(index)
         
 def can_king_castle(board, king):
+    king.can_king_castle()
     if king.color == 0:
         if king.can_castle_short == True:
+            move_piece(board, king, (5,7))
+            if is_white_in_check(board):
+                return False
+            move_piece(board, king, (6,7))
+            if is_white_in_check(board):
+                return False
+        elif king.can_castle_long == True:
             move_piece(board, king, (2,7))
             if is_white_in_check(board):
                 return False
-            move_piece(board, king, (1,7))
+            move_piece(board, king, (3,7))
+            if is_white_in_check(board):
+                return False
+    elif king.color == 1:
+        if king.can_castle_short == True:
+            move_piece(board, king, (5,0))
+            if is_white_in_check(board):
+                return False
+            move_piece(board, king, (6,0))
             if is_white_in_check(board):
                 return False
         elif king.can_castle_long == True:
-            return 1
-    elif king.color == 1:
-        if king.can_castle_short == True:
-            return 1
-        elif king.can_castle_long == True:
-            return 1       
+            move_piece(board, king, (2,0))
+            if is_white_in_check(board):
+                return False
+            move_piece(board, king, (3,0))
+            if is_white_in_check(board):
+                return False  
+    return True
 
 """
 Functions for when king is in check-state
@@ -315,32 +332,32 @@ Testing notes:
 """
     
 def add_white_pieces():
-    PW0 = Pawn(0, 0, 6, board)
+    PW0 = Pawn(0, 0, 6, board, False)
     add_piece (board, PW0)
 
-    PW1 = Pawn(0, 1, 6, board)
+    PW1 = Pawn(0, 1, 6, board, False)
     add_piece (board, PW1)
 
-    PW2 = Pawn(0, 2, 6, board)
+    PW2 = Pawn(0, 2, 6, board, False)
     add_piece (board, PW2)
 
-    PW3 = Pawn(0, 3, 6, board)
+    PW3 = Pawn(0, 3, 6, board, False)
     add_piece (board, PW3)
 
-    PW4 = Pawn(0, 4, 6, board)
+    PW4 = Pawn(0, 4, 6, board, False)
     add_piece (board, PW4)
 
-    PW5 = Pawn(0, 5, 6, board)
+    PW5 = Pawn(0, 5, 6, board, False)
     add_piece (board, PW5)
 
-    PW6 = Pawn(0, 6, 6, board)
+    PW6 = Pawn(0, 6, 6, board, False)
     add_piece (board, PW6)
 
-    PW7 = Pawn(0, 7, 6, board)
+    PW7 = Pawn(0, 7, 6, board, False)
     add_piece (board, PW7)
     
-    RW1 = Rook (0,0,7, board)
-    RW2 = Rook (0,7,7, board)
+    RW1 = Rook (0,0,7, board, False)
+    RW2 = Rook (0,7,7, board, False)
     add_piece (board, RW1)
     add_piece (board, RW2)
     
@@ -349,7 +366,7 @@ def add_white_pieces():
     add_piece (board, BW1)
     add_piece (board, BW2)
     
-    KW = King (0,4,7, board)
+    KW = King (0,4,7, board, False)
     add_piece (board, KW)
     
     QW = Queen (0,3,7, board)
@@ -362,32 +379,32 @@ def add_white_pieces():
     add_piece (board, HW2)
 
 def add_black_pieces():
-    BP0 = Pawn (1,0,1,board)
+    BP0 = Pawn (1,0,1,board, False)
     add_piece (board, BP0)
 
-    BP1 = Pawn (1,1,1,board)
+    BP1 = Pawn (1,1,1,board, False)
     add_piece (board, BP1)
 
-    BP2 = Pawn (1,2,1,board)
+    BP2 = Pawn (1,2,1,board, False)
     add_piece (board, BP2)
 
-    BP3 = Pawn (1,3,1,board)
+    BP3 = Pawn (1,3,1,board, False)
     add_piece (board, BP3)
 
-    BP4 = Pawn (1,4,1,board)
+    BP4 = Pawn (1,4,1,board, False)
     add_piece (board, BP4)
 
-    BP5 = Pawn (1,5,1,board)
+    BP5 = Pawn (1,5,1,board, False)
     add_piece (board, BP5)
 
-    BP6 = Pawn (1,6,1,board)
+    BP6 = Pawn (1,6,1,board, False)
     add_piece (board, BP6)
 
-    BP7 = Pawn (1,7,1,board)
+    BP7 = Pawn (1,7,1,board, False)
     add_piece (board, BP7)
 
-    RW1 = Rook (1,0,0, board)
-    RW2 = Rook (1,7,0, board)
+    RW1 = Rook (1,0,0, board, False)
+    RW2 = Rook (1,7,0, board, False)
     add_piece (board, RW1)
     add_piece (board, RW2)
     
@@ -396,7 +413,7 @@ def add_black_pieces():
     add_piece (board, BW1)
     add_piece (board, BW2)
     
-    KW = King (1,4,0, board)
+    KW = King (1,4,0, board, False)
     add_piece (board, KW)
     
     QW = Queen (1,3,0, board)

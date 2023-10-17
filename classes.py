@@ -504,7 +504,6 @@ class King(Piece):
                         self.can_castle_long = False
 
     def find_poss_moves(self):
-        self.can_king_castle()
         x,y = self.xpos,self.ypos
         temp_poss_moves = [(x+1,y),(x+1,y+1),(x,y+1),(x-1,y+1),(x-1,y),(x-1,y-1),(x,y-1),(x+1,y-1)]
         
