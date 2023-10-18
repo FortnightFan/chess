@@ -13,7 +13,7 @@ if (system == "Windows"):
 
 elif (system == "Linux"):
     script_directory = os.path.dirname(os.path.abspath(__name__))
-    stockfish_path = os.path.join(script_directory, "stockfish-ubuntu-x86-64-avx2")
+    stockfish_path = os.path.join(script_directory, "stockfish-ubuntu-x86-64-modern")
     stockfish = Stockfish(path=stockfish_path)
 else:
     print("ERROR")
