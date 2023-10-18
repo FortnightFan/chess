@@ -17,15 +17,26 @@ else:
     print("ERROR")
     exit()
     
+stockfish.update_engine_parameters({"Hash": 32})
 
+def ai_testbench(depth):
+    stockfish.set_depth(depth)
 
-start_time = time.time()
+    start_time = time.time()
 
-stockfish.set_skill_level(1)
-stockfish.set_depth(7)
-stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
-print(stockfish.get_best_move())
+    stockfish.set_fen_position("r1bqk2r/pppp1pp1/2nb1n1p/4p1B1/2B1P3/3P1N2/PPP2PPP/RN1QK2R w KQkq - 0 6")
+    stockfish.get_best_move()
+    #print(stockfish.get_best_move())
 
-end_time = time.time()
+    end_time = time.time()
+    print(f"Depth: {depth}")
+    print(f"Execution time: {(end_time - start_time):.5f} seconds")
 
-print(f"Script execution time: {(end_time - start_time):.2f} seconds")
+ai_testbench(1)
+ai_testbench(5)
+ai_testbench(7)
+ai_testbench(9)
+ai_testbench(12)
+ai_testbench(15)
+ai_testbench(20)
+ai_testbench(25)
