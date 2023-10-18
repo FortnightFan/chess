@@ -7,12 +7,12 @@ import platform
 # Checks OS and executes appropriate executable
 system = platform.system()
 if (system == "Windows"):
-    script_directory = os.path.dirname(os.path.abspath(__file__))
+    script_directory = os.path.dirname(os.path.abspath(__name__))
     stockfish_path = os.path.join(script_directory, "stockfish-windows-x86-64-avx2.exe")   
     stockfish = Stockfish(path=stockfish_path)
 
 elif (system == "Linux"):
-    script_directory = os.path.dirname(os.path.abspath(__file__))
+    script_directory = os.path.dirname(os.path.abspath(__name__))
     stockfish_path = os.path.join(script_directory, "stockfish-ubuntu-x86-64-avx2")
     stockfish = Stockfish(path=stockfish_path)
 else:
