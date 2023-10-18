@@ -12,9 +12,7 @@ if (system == "Windows"):
     stockfish = Stockfish(path=stockfish_path)
 
 elif (system == "Linux"):
-    script_directory = os.path.dirname(os.path.abspath(__name__))
-    stockfish_path = os.path.join(script_directory, "stockfish-ubuntu-x86-64-modern")
-    stockfish = Stockfish(path=stockfish_path)
+    stockfish = Stockfish('stockfish')
 else:
     print("ERROR")
     exit()
@@ -24,7 +22,7 @@ else:
 start_time = time.time()
 
 stockfish.set_skill_level(1)
-stockfish.set_depth(6)
+stockfish.set_depth(7)
 stockfish.set_fen_position("rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
 print(stockfish.get_best_move())
 
