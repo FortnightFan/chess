@@ -39,9 +39,9 @@ class Tile (Piece):
         return (f"__")
 
 class Pawn(Piece):
-    def __init__(self,color,xpos,ypos,board, has_moved):
+    def __init__(self,color,xpos,ypos,board):
         super().__init__(color,xpos,ypos,board)
-        self.has_moved = has_moved
+        self.has_moved = False
         self.poss_moves = []
         self.poss_captures = []        
     
@@ -377,7 +377,8 @@ class Queen(Piece):
                 else:
                     self.poss_moves.append((x,y))
                 x -= 1
-                
+            self.poss_moves = list(set(self.poss_moves))  
+            self.poss_moves.remove((self.xpos,self.ypos))
         if self.color == 1:
             
             while (x < 8 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #northeast
@@ -421,7 +422,7 @@ class Queen(Piece):
             
             x, y = self.xpos, self.ypos
             while y < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares south
-                if self.board[y][x].color == 1:
+                if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
                 else:
@@ -430,7 +431,7 @@ class Queen(Piece):
 
             y = self.ypos
             while y >= 0 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares north
-                if self.board[y][x].color == 1:
+                if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
                 else:
@@ -440,25 +441,24 @@ class Queen(Piece):
             y = self.ypos
             x = self.xpos
             while x < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares east
-                if self.board[y][x].color == 1:
+                if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
                 else:
                     self.poss_moves.append((x,y))
-                    break
                 x += 1
 
             x = self.xpos
             while x >= 0 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares west
-                if self.board[y][x].color == 1:
+                if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
                 else:
                     self.poss_moves.append((x,y))
                 x -= 1
                 
-        self.poss_moves = list(set(self.poss_moves))  
-        self.poss_moves.remove((self.xpos,self.ypos))
+            self.poss_moves = list(set(self.poss_moves))  
+            self.poss_moves.remove((self.xpos,self.ypos))
             
 class King(Piece):
     def __init__(self,color,xpos,ypos,board, has_moved):

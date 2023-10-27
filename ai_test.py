@@ -25,8 +25,8 @@ def ai_testbench(depth):
     start_time = time.time()
 
     stockfish.set_fen_position("r1bqk2r/pppp1pp1/2nb1n1p/4p1B1/2B1P3/3P1N2/PPP2PPP/RN1QK2R w KQkq - 0 6")
-    stockfish.get_best_move()
-    #print(stockfish.get_best_move())
+    #sstockfish.get_best_move()
+    print(stockfish.get_best_move())
 
     end_time = time.time()
     print(f"Depth: {depth}")

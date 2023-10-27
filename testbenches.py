@@ -1,6 +1,6 @@
 from chess import *
 from classes import *
-
+from ai_engine import *
 """
 Pieces are represented by a letter
 
@@ -87,11 +87,56 @@ def black_rook_pin_testbench(): #expected output: White rook can only move in co
     clear_all_lists(board)
     clear_board()
 
-print("BLACK ROOK TEST")
-white_rook_pin_testbench()
-print("\nBLACK ROOK DIFFERENT INITIAL LOCATION TEST")
-white_rook_diff_initial_pin_testbench()#INCORRECT OUTPUT. CAPTURES PAWN ONLY
-print("\nWHITE ROOK TEST")
-black_rook_pin_testbench() #INCORRECT OUTPUT. CAPTURES PAWN ONLY
+def stalemate_testbench():  #expected output: White has no legal moves, therefore 'True' should be printed out
+    king =  King(0,4,7,board, False)
+    add_piece(board,king)
+    init(board)
+
+    add_piece(board, Horse(1,3,7,board))
+    add_piece(board, Horse(1,5,7,board))
+    add_piece(board, Horse(1,3,6,board))
+    add_piece(board, Horse(1,4,6,board))
+    add_piece(board, Horse(1,5,6,board))
+
+    add_piece(board, Queen(1,2,6,board))
+    add_piece(board, Queen(1,6,6,board))
+    add_piece(board, Queen(1,4,5,board))
+    add_piece(board, Pawn(0,0,5,board))
+    print_board(board)
+    find_all_poss_moves(board)
+    legal_king_moves(board, king)
+
+    print(king.poss_moves,king.poss_captures)
+    print(is_white_stalemate(board))
+
+def checkmate_testbench_white():
+    add_piece(board,board[white_king_pos[1]][white_king_pos[0]])
+    init(board)
+
+    add_piece(board, Queen(1,3,7,board))
+    add_piece(board, Queen(1,4,6,board))
+
+    pawn = Pawn(0,0,6,board)
+    add_piece(board, pawn)
+
+    print_board(board)
+
+    find_all_poss_moves(board)
+
+    print(is_white_checkmate(board))
+
+# print("BLACK ROOK TEST")
+# white_rook_pin_testbench()
+# print("\nBLACK ROOK DIFFERENT INITIAL LOCATION TEST")
+# white_rook_diff_initial_pin_testbench()#INCORRECT OUTPUT. CAPTURES PAWN ONLY
+# print("\nWHITE ROOK TEST")
+# black_rook_pin_testbench() #INCORRECT OUTPUT. CAPTURES PAWN ONLY
 
 
+# stalemate_testbench()
+
+def promotions_testbench():
+    fen_to_board("rnb2bnr/pp1P1kp1/2p2p1p/4p3/4P3/8/PPP2PPP/R1BQKBNR w KQ - 0 11")
+    move_piece(board, board[1][3], (3,0))
+    check_promotions(board, 0)
+    print_board(board)
