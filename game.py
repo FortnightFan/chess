@@ -1,6 +1,4 @@
 from chess import *
-from classes import *
-from ai_engine import *
 
 def print_board_game(board):
     for i, row in enumerate(board):
@@ -42,8 +40,7 @@ def white_move():
     global game_over_id
 
     find_all_poss_moves(board)
-    # can_king_castle(board, 0)
-    legal_king_moves(board, board[white_king_pos[1]][white_king_pos[0]])
+    legal_king_moves(board, 0)
     
     if (is_white_stalemate(board)):
         game_over_id = 0
@@ -66,17 +63,6 @@ def white_move():
                 move = input("White's Turn! Enter move:\n")
                 
     castle = move_piece(board, piece, move[1])
-    # if castle == True:
-    #     while (1):
-    #         move = input ("Castling detected. Move Rook accordingly.\n")
-    #         move = move_to_tuple(0,move)
-    #         if (move == False):
-    #             print("ERROR: Move Rook accordingly Please try again.")
-    #         else:
-    #             if (move[1] in piece.poss_moves):
-    #                 break
-    #             else:
-    #                 print("ERROR: Move Rook accordingly Please try again.")
 
     clear_all_lists(board)
     
@@ -96,7 +82,7 @@ def black_move():
     global game_over_id
 
     find_all_poss_moves(board)
-    legal_king_moves(board, board[black_king_pos[1]][black_king_pos[0]])
+    legal_king_moves(board, 1)
     # can_king_castle(board, 1)
 
     if (is_black_stalemate(board)):
@@ -211,8 +197,8 @@ def white_move_ai():
     global game_over_id
 
     find_all_poss_moves(board)
-    legal_king_moves(board, board[white_king_pos[1]][white_king_pos[0]])
-    
+    legal_king_moves(board, 0)
+
     if is_white_checkmate(board):
         game_over_id = 1
         state = 6
@@ -222,15 +208,17 @@ def white_move_ai():
         game_over_id = 0
         state = 6
         return
-
-    clear_all_lists(board)
-
+    
     print ("White AI's Turn:")
     move,tup = get_best_move(board, 0)
+    if move == None:
+        game_over_id = 1
+        state = 6
+        return
     move_piece(board, board[tup[0][1]][tup[0][0]], tup[1])  
     print (f"White AI moves {move}")
     
-    check_promotions(board, 1)
+    check_promotions(board, 0)
 
     if (black_ai_switch):
         state = 5
@@ -239,6 +227,7 @@ def white_move_ai():
     else:
         state = 1
         
+    clear_all_lists(board)
     print("\n------------------------------\n")
     print_board_game(board)
       
@@ -246,8 +235,7 @@ def black_move_ai():
     global state
     global game_over_id
     find_all_poss_moves(board)
-    legal_king_moves(board, board[black_king_pos[1]][black_king_pos[0]])
-    
+    legal_king_moves(board, 1)
     if is_black_checkmate(board):
         game_over_id = 2
         state = 6
@@ -258,10 +246,12 @@ def black_move_ai():
         state = 6
         return
 
-    clear_all_lists(board)
-
     print ("Black AI's Turn:")
     move,tup = get_best_move(board, 1)
+    if move == None:
+        game_over_id = 2
+        state = 6
+        return
     move_piece(board, board[tup[0][1]][tup[0][0]], tup[1])  
     print (f"Black AI moves {move}")
     
@@ -273,7 +263,7 @@ def black_move_ai():
         state = 2
     else:
         state = 0
-        
+    clear_all_lists(board)
     print("\n------------------------------\n")
     print_board_game(board)
     
@@ -314,4 +304,10 @@ State 3: Black's move, currently in check.
 State 4: White's move, AI on.
 State 5: Black's move, AI on. 
 State 6: End
+"""
+
+
+"""
+8/4kpQ1/1p2p2p/7P/1b1P4/6PR/5K2/4q3 w - - 0 0 < not a checkmate but happened anyways. why?
+4K3/8/4kp2/4p3/6P1/1p3P2/8/8 w - - 0 0 < not a tie???
 """

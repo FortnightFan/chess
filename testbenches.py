@@ -1,6 +1,5 @@
 from chess import *
-from classes import *
-from ai_engine import *
+import code
 """
 Pieces are represented by a letter
 
@@ -128,7 +127,7 @@ def checkmate_testbench_white():
 # print("BLACK ROOK TEST")
 # white_rook_pin_testbench()
 # print("\nBLACK ROOK DIFFERENT INITIAL LOCATION TEST")
-# white_rook_diff_initial_pin_testbench()#INCORRECT OUTPUT. CAPTURES PAWN ONLY
+#white_rook_diff_initial_pin_testbench()#INCORRECT OUTPUT. CAPTURES PAWN ONLY
 # print("\nWHITE ROOK TEST")
 # black_rook_pin_testbench() #INCORRECT OUTPUT. CAPTURES PAWN ONLY
 
@@ -140,3 +139,20 @@ def promotions_testbench():
     move_piece(board, board[1][3], (3,0))
     check_promotions(board, 0)
     print_board(board)
+
+def live_shell_testbench():
+    fen_to_board("4B3/8/4n3/1p6/2b5/k1K5/8/8 w - - 0 0")
+    namespace = locals()
+    namespace.update(globals())
+    code.interact(local=namespace)
+    
+
+def misc_testbench():
+    fen_to_board("4K3/8/4kp2/4p3/6P1/1p3P2/8/8 w - - 0 0 ")
+    print_board(board)
+    find_all_poss_moves(board)
+    legal_king_moves(board)
+    print(is_black_stalemate(board))
+
+    
+misc_testbench()
