@@ -764,7 +764,8 @@ def is_white_stalemate(board):
         for col in range(0, 8):   
             piece = board[row][col]
             if (piece.color == 0):
-                flag1 = False
+                if (piece.poss_moves != [] or piece.poss_captures != []):
+                    flag1 = False
             if not isinstance(piece, King):
                 flag2 = False
     print (flag1,flag1_1,flag2)
@@ -919,6 +920,13 @@ def init(board):    #Corrects the king position variables.
     for row in range(0,8):
         for col in range(0,8):
             piece = board[row][col]
+            if isinstance(piece, Pawn):
+                if piece.color == 0:
+                    if piece.ypos != 6:
+                        piece.has_moved == False
+                if piece.color == 1:
+                    if piece.ypos != 1:
+                        piece.has_moved == False
             if isinstance(piece, King):
                 if piece.color == 0:
                     white_king_pos = (piece.xpos,piece.ypos)
@@ -928,6 +936,11 @@ def init(board):    #Corrects the king position variables.
 """
 Stockfish initialization
 """
+
+global white_ai_skill   #values range from 1-20, 1 being the worst. 
+global black_ai_skill
+white_ai_skill = 20
+black_ai_skill = 3
 
 system = platform.system()
 if (system == "Windows"):
@@ -944,7 +957,7 @@ else:
 
 def fish_init():
     stockfish.set_depth(10)
-    stockfish.update_engine_parameters({"Hash": 32, "Skill Level": 15})
+    stockfish.update_engine_parameters({"Hash": 32, "Skill Level": 10})
 
 def move_to_tuple(color, move):    #returns piece location, and piece move location.
     ret1 = 0
@@ -1141,6 +1154,10 @@ def fen_to_board(fen):
 def get_best_move(board, color):
     fen = board_to_fen(board, color)
     stockfish.set_fen_position(fen)
+    if color == 0:
+        stockfish.set_skill_level(white_ai_skill)
+    elif color == 1:
+        stockfish.set_skill_level(black_ai_skill)
     move = stockfish.get_best_move()
     print(move)
     return move, move_to_tuple(color, move)
