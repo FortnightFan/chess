@@ -2,6 +2,7 @@ import time
 from stockfish import Stockfish
 import os
 import platform
+from chess import *
 
 
 # Checks OS and executes appropriate executable
@@ -23,7 +24,7 @@ def ai_testbench(depth):
     stockfish.set_depth(depth)
 
     start_time = time.time()
-
+    stockfish.set_skill_level(10)
     stockfish.set_fen_position("r1bqk2r/pppp1pp1/2nb1n1p/4p1B1/2B1P3/3P1N2/PPP2PPP/RN1QK2R w KQkq - 0 6")
     #sstockfish.get_best_move()
     print(stockfish.get_best_move())
@@ -38,5 +39,18 @@ ai_testbench(7)
 ai_testbench(9)
 ai_testbench(12)
 ai_testbench(15)
-ai_testbench(20)
-ai_testbench(25)
+# ai_testbench(20)
+# ai_testbench(25)
+
+def example_ai_move_testbench():
+    fen_to_board("4k3/3r4/8/1B6/2p2pP1/5P2/8/4K3 w - - 0 1")
+    
+    for i, row in enumerate(board):
+        print(8-i, end="  ")
+        for j in row:
+            print(j, end=" ")
+        print()
+    print("   A  B  C  D  E  F  G  H")
+
+    fish_init()
+    get_best_move(board, 0)

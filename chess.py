@@ -754,42 +754,44 @@ def can_king_castle(board, color):   #appends coords if king can legally castle 
             move_piece(board,king, (4,0))
 
 def is_white_stalemate(board):
-    flag1 = True    #no possible white movements
-    flag2 = True
     king = board[white_king_pos[1]][white_king_pos[0]]
 
+    flag1 = True    #false = a non-king piece is on the board that has a possible move. 
     flag1_1 = (king.poss_moves == [] and king.poss_captures == [])  #no possible king moves
+    flag2 = True    #checks for insufficient material
 
     for row in range(0, 8):
         for col in range(0, 8):   
             piece = board[row][col]
             if (piece.color == 0):
-                if (piece.poss_moves != [] or piece.poss_captures != []):
+                if ((piece.poss_moves != [] or piece.poss_captures != []) and not isinstance(piece, King)):
                     flag1 = False
-            if not isinstance(piece, King):
+            if (not isinstance(piece,(King, Tile))):
                 flag2 = False
-    print (flag1,flag1_1,flag2)
+    
+    # print (flag1,flag1_1, flag2)
     return (flag1 and flag1_1) or flag2
     
         
 def is_black_stalemate(board):
-    flag1 = True
-    flag2 = True
     king = board[black_king_pos[1]][black_king_pos[0]]
 
-    flag1_1 = (king.poss_moves == [] and king.poss_captures == [])
+    flag1 = True    #false = a non-king piece is on the board that has a possible move. 
+    flag1_1 = (king.poss_moves == [] and king.poss_captures == [])  #no possible king moves
+    flag2 = True    #checks for insufficient material
 
     for row in range(0, 8):
         for col in range(0, 8):   
             piece = board[row][col]
             if (piece.color == 1):
-                if (piece.poss_moves != [] or piece.poss_captures != []):
+                if ((piece.poss_moves != [] or piece.poss_captures != []) and not isinstance(piece, King)):
                     flag1 = False
-            if not isinstance(piece, King):
+            if (not isinstance(piece,(King, Tile))):
                 flag2 = False
-    print (flag1,flag1_1,flag2)
+    
+    # print (flag1,flag1_1, flag2)
     return (flag1 and flag1_1) or flag2
-
+    
 def check_promotions(board, color):
     if color == 0:
         for i in range (0,8):
@@ -939,8 +941,8 @@ Stockfish initialization
 
 global white_ai_skill   #values range from 1-20, 1 being the worst. 
 global black_ai_skill
-white_ai_skill = 20
-black_ai_skill = 3
+white_ai_skill = 15
+black_ai_skill = 14
 
 system = platform.system()
 if (system == "Windows"):
@@ -956,7 +958,7 @@ else:
 
 
 def fish_init():
-    stockfish.set_depth(10)
+    stockfish.set_depth(7)
     stockfish.update_engine_parameters({"Hash": 32, "Skill Level": 10})
 
 def move_to_tuple(color, move):    #returns piece location, and piece move location.
@@ -978,26 +980,26 @@ def move_to_tuple(color, move):    #returns piece location, and piece move locat
     return (ret1,8-ret2), (ret3,8-ret4)
 
 def board_to_fen(board, color):
-    if (isinstance(board[0][0], Rook)):
-        if board[0][0].has_moved == False:
-            qrook = True
-        else:
-            qrook = False
-    if (isinstance(board[0][0], Rook)):
-        if board[0][0].has_moved == False:
-            krook = True
-        else:
-            krook = False
-    if (isinstance(board[0][0], Rook)):
-        if board[0][0].has_moved == False:
-            Qrook = True
-        else:
-            Qrook = False
-    if (isinstance(board[0][0], Rook)):
-        if board[0][0].has_moved == False:
-            Krook = True
-        else:
-            Krook = False
+    # if (isinstance(board[0][0], Rook)):
+    #     if board[0][0].has_moved == False:
+    #         qrook = True
+    #     else:
+    #         qrook = False
+    # if (isinstance(board[0][0], Rook)):
+    #     if board[0][0].has_moved == False:
+    #         krook = True
+    #     else:
+    #         krook = False
+    # if (isinstance(board[0][0], Rook)):
+    #     if board[0][0].has_moved == False:
+    #         Qrook = True
+    #     else:
+    #         Qrook = False
+    # if (isinstance(board[0][0], Rook)):
+    #     if board[0][0].has_moved == False:
+    #         Krook = True
+    #     else:
+    #         Krook = False
 
     str_ret = ""
     temp = 0

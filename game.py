@@ -12,7 +12,7 @@ global state #variable to track state of the game
 state = 0
 game_over_id = -1
 
-white_ai_switch = True
+white_ai_switch = False
 black_ai_switch = True
 
 def initialize_game():
@@ -62,7 +62,7 @@ def white_move():
                 print("ERROR: Piece can't move there. Please try again.")
                 move = input("White's Turn! Enter move:\n")
                 
-    castle = move_piece(board, piece, move[1])
+    move_piece(board, piece, move[1])
 
     clear_all_lists(board)
     
@@ -83,7 +83,6 @@ def black_move():
 
     find_all_poss_moves(board)
     legal_king_moves(board, 1)
-    # can_king_castle(board, 1)
 
     if (is_black_stalemate(board)):
         game_over_id = 0

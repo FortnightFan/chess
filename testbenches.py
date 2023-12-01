@@ -148,11 +148,16 @@ def live_shell_testbench():
     
 
 def misc_testbench():
-    fen_to_board("4K3/8/4kp2/4p3/6P1/1p3P2/8/8 w - - 0 0 ")
+    fen_to_board("4k3/3r4/8/1B6/2p2pP1/5P2/8/4K3 w - - 0 1")
     print_board(board)
     find_all_poss_moves(board)
-    legal_king_moves(board)
-    print(is_black_stalemate(board))
+    piece = board[3][1]
+    check_pin(board, piece)
+    print("Piece: White bishop at (1,3)")
+    print("Possible moves")
+    print(piece.poss_moves)
+    print("Possible captures")
+    print(piece.poss_captures)
+    legal_king_moves(board, 0)
 
-    
 misc_testbench()
