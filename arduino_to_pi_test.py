@@ -1,10 +1,14 @@
 import serial
 import time
 import platform
+import threading
+
+uid = "B8437812"
+
 system = platform.system()
 if (system == "Windows"):
     ser1 = serial.Serial('COM4',9600)
-    ser2 = serial.Serial('COM5',9600)
+    ser2 = serial.Serial('COM7',9600)
 elif (system == "Linux"):
     ser1 = serial.Serial('/dev/ttyUSB0',9600)
     ser2 = serial.Serial('/dev/ttyUSB1',9600)
@@ -15,22 +19,44 @@ else:
     exit()
 
 def deserialize (serialized_data):
-    if serialized_data[0] == '/':
-        return serialized_data[1:]
+    ser_data = serialized_data.split("/")
+    return ser_data[0],ser_data[1]
+
+def read_port_1():
+    while True:
+        try:
+            data = ser1.readline().decode('ascii').strip()
+            reader,data = deserialize(data)
+            print(f"Reader: {int(reader)+2}\nData: {data}")
+            ser1.flushInput()
+        except UnicodeDecodeError:
+            print("initializing...")
+
+def read_port_2():
+    while True:
+        try:
+            data = ser2.readline().decode('ascii').strip()
+            reader,data = deserialize(data)
+            print(f"Reader: {int(reader)}\nData: {data}")
+            ser2.flushInput()
+        except UnicodeDecodeError:
+            print("initializing...")
+            
+
+thread1 = threading.Thread(target=read_port_1)
+thread2 = threading.Thread(target=read_port_2)
 
 try:
+    # Start threads
+    thread1.start()
+    thread2.start()
     while True:
-        #Recieve and read data
-        # data = ser2.readline().decode('utf-8').strip()
-        # data = deserialize(data)
-        # print(data)
-        # data = ser1.readline().decode('utf-8').strip()
-        # data = deserialize(data)
-        # print(data)
-        # time.sleep(1)
+        time.sleep(1)
+    # Keep the main thread alive
 
-        #Send data
-        ser1.write("/turn_off_led".encode())
+
 except KeyboardInterrupt:
+    thread1.join()
+    thread2.join()
     ser1.close()
     ser2.close()
