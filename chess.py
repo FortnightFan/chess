@@ -4,19 +4,48 @@ import os
 import platform
 
 """
+Parameters that need to be initialized prior to runtime. Via on-board I/O
+    -white/black ai switch. Write values into white/black_ai_switch.
+    -skill level for each color. 3 levels are predetermined. Write values into white/black_ai_skill
+    
+These values should be able to be updated in real-time. This can be accomplished by creating a thread via python "import threading" that runs an inf while loop and reads input from the external IO.
+"""
+
+global SIZE_H
+global SIZE_V
+
+SIZE_H = 3
+SIZE_V = 3
+
+global white_ai_skill   #values range from 1-20, 1 being the worst. 
+global black_ai_skill
+
+global SKILL_LOW
+global SKILL_MEDIUM
+global SKILL_HIGH
+
+SKILL_LOW = 5
+SKILL_MEDIUM = 10
+SKILL_HIGH = 18
+
+global white_ai_switch
+global black_ai_switch
+
+white_ai_switch = True
+black_ai_switch = True
+
+white_ai_skill = SKILL_LOW
+black_ai_skill = SKILL_HIGH
+        
+        
+"""
 Chess classes
 """   
-        
-board = [
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0]
-]
+
+board = [[0 for _ in range(SIZE_H)] for _ in range(SIZE_V)]
+
+
+print(board)
 global white_king_pos
 global black_king_pos
 white_king_pos = (4,7)
@@ -43,7 +72,20 @@ class Tile (Piece):
     def __str__ (self):
         return (f"__")
 
-class Pawn(Piece):
+"""
+Initializes the board array with tile objects.
+"""
+
+tile = Tile(2,0,0,board)
+for i in range (0,SIZE_V):
+    for j in range (0,SIZE_H):
+        board[i][j] = tile
+
+"""
+Piece class declarations.
+"""
+
+class Pawn(Piece):      #Possible out of bounds issues if initialized close to the edge as it pre-empts moves ahead of the piece. 
     def __init__(self,color,xpos,ypos,board):
         super().__init__(color,xpos,ypos,board)
         self.has_moved = False
@@ -69,7 +111,7 @@ class Pawn(Piece):
             if self.xpos == 0 and self.ypos >= 0:               #find possible pawn captures, white
                 if self.board[y-1][x+1].color == 1:
                     self.poss_captures.append((x+1,y-1))
-            if self.xpos == 7 and self.ypos >= 0:
+            if self.xpos == SIZE_H and self.ypos >= 0:
                 if self.board[y-1][x-1].color == 1:
                     self.poss_captures.append((x-1,y-1))           
             elif self.ypos >= 0:
@@ -83,16 +125,16 @@ class Pawn(Piece):
                 if self.board[y+2][x] == tile and self.board[y+1][x] == tile:
                     self.poss_moves.append((self.xpos,self.ypos+2))
                     self.poss_moves.append((self.xpos,self.ypos+1))
-            elif self.ypos < 8 and self.board[y+1][x] == tile:
+            elif self.ypos < SIZE_V and self.board[y+1][x] == tile:
                 self.poss_moves.append((self.xpos,self.ypos+1))
                 
-            if self.xpos == 0 and self.ypos < 8:                #find possible pawn captures, white
+            if self.xpos == 0 and self.ypos < SIZE_V:                #find possible pawn captures, white
                 if self.board[y+1][x+1].color == 0:
                     self.poss_captures.append((x+1,y+1))
-            if self.xpos == 7 and self.ypos < 8:
+            if self.xpos == 7 and self.ypos < SIZE_V:
                 if self.board[y+1][x-1].color == 0:
                     self.poss_captures.append((x-1,y+1))           
-            elif self.ypos < 8:
+            elif self.ypos < SIZE_V:
                 if self.board[y+1][x-1].color == 0:
                     self.poss_captures.append((x-1,y+1))
                 if self.board[y+1][x+1].color == 0:
@@ -105,9 +147,8 @@ class Pawn(Piece):
         self.poss_captures = []
 
 class Rook(Piece):
-    def __init__(self,color,xpos,ypos,board, has_moved):
+    def __init__(self,color,xpos,ypos,board):
         super().__init__(color,xpos,ypos,board)
-        self.has_moved = has_moved
         self.poss_moves = []
         self.poss_captures = []      
 
@@ -120,7 +161,7 @@ class Rook(Piece):
     def find_poss_moves(self):
         if self.color == 0:     #white
             x, y = self.xpos, self.ypos
-            while y < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares south
+            while y < SIZE_V and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares south
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -139,7 +180,7 @@ class Rook(Piece):
 
             y = self.ypos
             x = self.xpos
-            while x < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares east
+            while x < SIZE_H and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares east
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -158,7 +199,7 @@ class Rook(Piece):
             
         elif self.color == 1:     #black
             x, y = self.xpos, self.ypos
-            while y < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares south
+            while y < SIZE_V and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares south
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -177,7 +218,7 @@ class Rook(Piece):
 
             y = self.ypos
             x = self.xpos
-            while x < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares east
+            while x < SIZE_H and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares east
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -209,7 +250,7 @@ class Bishop(Piece):
         x,y = self.xpos,self.ypos
         if (self.color == 0):       #white
             
-            while (x < 8 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #northeast
+            while (x < SIZE_H and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #northeast
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -229,7 +270,7 @@ class Bishop(Piece):
                 y -= 1
                 
             x,y = self.xpos,self.ypos
-            while (x < 8 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southeast
+            while (x < SIZE_H and y < SIZE_V) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southeast
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -239,7 +280,7 @@ class Bishop(Piece):
                 y += 1
 
             x,y = self.xpos,self.ypos
-            while (x >= 0 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southwest
+            while (x >= 0 and y < SIZE_V) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southwest
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -253,7 +294,7 @@ class Bishop(Piece):
             
         elif (self.color == 1):     #black
             
-            while (x < 8 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #northeast
+            while (x < SIZE_H and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #northeast
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -273,7 +314,7 @@ class Bishop(Piece):
                 y -= 1
                 
             x,y = self.xpos,self.ypos
-            while (x < 8 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southeast
+            while (x < SIZE_H and y < SIZE_V) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southeast
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -283,7 +324,7 @@ class Bishop(Piece):
                 y += 1
 
             x,y = self.xpos,self.ypos
-            while (x >= 0 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southwest
+            while (x >= 0 and y < SIZE_V) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southwest
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -307,7 +348,7 @@ class Queen(Piece):
         x,y = self.xpos,self.ypos
         if (self.color == 0):      
             
-            while (x < 8 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #northeast
+            while (x < SIZE_H and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #northeast
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -327,7 +368,7 @@ class Queen(Piece):
                 y -= 1
                 
             x,y = self.xpos,self.ypos
-            while (x < 8 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southeast
+            while (x < SIZE_H and y < SIZE_V) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southeast
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -337,7 +378,7 @@ class Queen(Piece):
                 y += 1
 
             x,y = self.xpos,self.ypos
-            while (x >= 0 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southwest
+            while (x >= 0 and y < SIZE_V) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  #southwest
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -347,7 +388,7 @@ class Queen(Piece):
                 y += 1       
                 
             x, y = self.xpos, self.ypos
-            while y < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares south
+            while y < SIZE_V and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares south
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -366,7 +407,7 @@ class Queen(Piece):
 
             y = self.ypos
             x = self.xpos
-            while x < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares east
+            while x < SIZE_H and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 1):  # checks all squares east
                 if self.board[y][x].color == 1:
                     self.poss_captures.append((x,y))
                     break
@@ -386,7 +427,7 @@ class Queen(Piece):
             self.poss_moves.remove((self.xpos,self.ypos))
         if self.color == 1:
             
-            while (x < 8 and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #northeast
+            while (x < SIZE_H and y >= 0) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #northeast
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -406,7 +447,7 @@ class Queen(Piece):
                 y -= 1
                 
             x,y = self.xpos,self.ypos
-            while (x < 8 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southeast
+            while (x < SIZE_H and y < SIZE_V) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southeast
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -416,7 +457,7 @@ class Queen(Piece):
                 y += 1
 
             x,y = self.xpos,self.ypos
-            while (x >= 0 and y < 8) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southwest
+            while (x >= 0 and y < SIZE_V) and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  #southwest
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -426,7 +467,7 @@ class Queen(Piece):
                 y += 1
             
             x, y = self.xpos, self.ypos
-            while y < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares south
+            while y < SIZE_V and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares south
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -445,7 +486,7 @@ class Queen(Piece):
 
             y = self.ypos
             x = self.xpos
-            while x < 8 and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares east
+            while x < SIZE_H and (self.board[y][x] == tile or self.board[y][x] == self or self.board[y][x].color == 0):  # checks all squares east
                 if self.board[y][x].color == 0:
                     self.poss_captures.append((x,y))
                     break
@@ -466,13 +507,10 @@ class Queen(Piece):
             self.poss_moves.remove((self.xpos,self.ypos))
             
 class King(Piece):
-    def __init__(self,color,xpos,ypos,board, has_moved):
+    def __init__(self,color,xpos,ypos,board):
         super().__init__(color,xpos,ypos,board)
-        self.has_moved = has_moved
         self.poss_moves = []
         self.poss_captures = []      
-        self.can_castle_short = False
-        self.can_castle_long = False
 
     def __str__ (self):
         if self.color == 0:
@@ -515,7 +553,7 @@ class King(Piece):
         if self.color == 0:    
             for coord in temp_poss_moves:
                 x,y = coord
-                if (x < 8 and x >= 0 and y < 8 and y >= 0):    #checking if in bounds
+                if (x < SIZE_H and x >= 0 and y < SIZE_V and y >= 0):    #checking if in bounds
                     if (self.board[y][x] == tile):
                         self.poss_moves.append((x,y))
                     if (self.board[y][x].color == 1):
@@ -523,7 +561,7 @@ class King(Piece):
         if self.color == 1:
             for coord in temp_poss_moves:
                 x,y = coord
-                if (x < 8 and x >= 0 and y < 8 and y >= 0):    #checking if in bounds
+                if (x < SIZE_H and x >= 0 and y < SIZE_V and y >= 0):    #checking if in bounds
                     if (self.board[y][x] == tile):
                         self.poss_moves.append((x,y))
                     if (self.board[y][x].color == 0):
@@ -543,7 +581,7 @@ class Horse(Piece):
         if self.color == 0:    
             for coord in temp_poss_moves:
                 x,y = coord
-                if (x < 8 and x >= 0 and y < 8 and y >= 0):    #checking if in bounds
+                if (x < SIZE_H and x >= 0 and y < SIZE_V and y >= 0):    #checking if in bounds
                     if (self.board[y][x] == tile):
                         self.poss_moves.append((x,y))
                     if (self.board[y][x].color == 1):
@@ -551,19 +589,18 @@ class Horse(Piece):
         if self.color == 1:
             for coord in temp_poss_moves:
                 x,y = coord
-                if (x < 8 and x >= 0 and y < 8 and y >= 0):    #checking if in bounds
+                if (x < SIZE_H and x >= 0 and y < SIZE_V and y >= 0):    #checking if in bounds
                     if (self.board[y][x] == tile):
                         self.poss_moves.append((x,y))
                     if (self.board[y][x].color == 0):
                         self.poss_captures.append((x,y))
                                      
-tile = Tile(2,0,0,board)
-for i in range (0,8):
-    for j in range (0,8):
-        board[i][j] = tile
 
 def print_board(board):         #prints status of the board to terminal. 
-    print("    0  1  2  3  4  5  6  7")
+    tmp_str = "  "
+    for i in range (0,SIZE_H):
+        tmp_str += "  " + str(i)
+    print(tmp_str)
     for i, row in enumerate(board):
         print(i, end="  ")
         for j in row:
@@ -594,14 +631,15 @@ def move_piece(board,piece, pos):  #moves a piece to tuple pos
         board[pos[1]][pos[0]].has_moved = True
 
 def find_all_poss_moves(board):
-    for row in range (0,8):
-        for col in range (0,8):
+    clear_all_lists(board)
+    for row in range (0,SIZE_V):
+        for col in range (0,SIZE_H):
             if not isinstance(board[row][col], Tile):
                 board[row][col].find_poss_moves()
 
 def clear_all_lists(board):
-    for row in range(0,8):
-        for col in range(0,8):
+    for row in range(0,SIZE_V):
+        for col in range(0,SIZE_H):
             board[row][col].clear_lists()
             
 def piece_testbench(board,piece):       #adds a given piece to the board at location. Board is printed, and possible captures and moves are printed out
@@ -660,23 +698,25 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
     moves_to_remove = []
     captures_to_remove = []
     if (piece.color == 0):
-        for i in range(len(piece.poss_moves)):
+        for i in range(len(piece.poss_moves)):      #Move the piece to all possible locations
             move_piece(board, piece, piece.poss_moves[i])
-            for row in range(0, 8):
-                for col in range(0, 8):
+            for row in range(0, SIZE_V):            #For each board position, loop through the board, find the possible moves 
+                for col in range(0, SIZE_H):
                     if board[row][col].color == 1:
+                        board[row][col].clear_lists() 
                         board[row][col].find_poss_moves()
-                        if white_king_pos in board[row][col].poss_captures:
+                        if white_king_pos in board[row][col].poss_captures: #If the movement results in the king being able to be captured, note the move made, so it can be removed later.
                             moves_to_remove.append(i)
                         board[row][col].clear_lists()        
-            move_piece(board, piece, (x, y))
+            move_piece(board, piece, (x, y))        #Return piece back to original place.
 
-        for i in range(len(piece.poss_captures)):
+        for i in range(len(piece.poss_captures)):   #Same logic but for captures
             temp = board[piece.poss_captures[i][1]][piece.poss_captures[i][0]]
             move_piece(board, piece, piece.poss_captures[i])
-            for row in range(0, 8):
-                for col in range(0, 8):
+            for row in range(0, SIZE_V):
+                for col in range(0, SIZE_H):
                     if board[row][col].color == 1:
+                        board[row][col].clear_lists()        
                         board[row][col].find_poss_moves()
                         if white_king_pos in board[row][col].poss_captures:
                             captures_to_remove.append(i)
@@ -688,9 +728,10 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
         for i in range(len(piece.poss_moves)):
             move_piece(board, piece, piece.poss_moves[i])
             
-            for row in range(0, 8):
-                for col in range(0, 8):
+            for row in range(0, SIZE_V):
+                for col in range(0, SIZE_H):
                     if board[row][col].color == 0:
+                        board[row][col].clear_lists()        
                         board[row][col].find_poss_moves()
                         if black_king_pos in board[row][col].poss_captures:
                             moves_to_remove.append(i) 
@@ -700,9 +741,10 @@ def check_pin(board, piece):    #removes possible moves that will cause their ow
         for i in range(len(piece.poss_captures)):
             temp = board[piece.poss_captures[i][1]][piece.poss_captures[i][0]]
             move_piece(board, piece, piece.poss_captures[i])
-            for row in range(0, 8):
-                for col in range(0, 8):
+            for row in range(0, SIZE_V):
+                for col in range(0, SIZE_H):
                     if board[row][col].color == 0:
+                        board[row][col].clear_lists()        
                         board[row][col].find_poss_moves()
                         if black_king_pos in board[row][col].poss_captures:
                             captures_to_remove.append(i)
@@ -760,16 +802,16 @@ def is_white_stalemate(board):
     flag1_1 = (king.poss_moves == [] and king.poss_captures == [])  #no possible king moves
     flag2 = True    #checks for insufficient material
 
-    for row in range(0, 8):
-        for col in range(0, 8):   
+    for row in range(0, SIZE_V):
+        for col in range(0, SIZE_H):   
             piece = board[row][col]
             if (piece.color == 0):
                 if ((piece.poss_moves != [] or piece.poss_captures != []) and not isinstance(piece, King)):
                     flag1 = False
-            if (not isinstance(piece,(King, Tile))):
-                flag2 = False
+                if (not isinstance(piece,(King, Tile))):
+                    flag2 = False
     
-    # print (flag1,flag1_1, flag2)
+    print (flag1,flag1_1, flag2)
     return (flag1 and flag1_1) or flag2
     
         
@@ -780,33 +822,33 @@ def is_black_stalemate(board):
     flag1_1 = (king.poss_moves == [] and king.poss_captures == [])  #no possible king moves
     flag2 = True    #checks for insufficient material
 
-    for row in range(0, 8):
-        for col in range(0, 8):   
+    for row in range(0, SIZE_V):
+        for col in range(0, SIZE_H):   
             piece = board[row][col]
             if (piece.color == 1):
                 if ((piece.poss_moves != [] or piece.poss_captures != []) and not isinstance(piece, King)):
                     flag1 = False
-            if (not isinstance(piece,(King, Tile))):
-                flag2 = False
-    
-    # print (flag1,flag1_1, flag2)
+                if (not isinstance(piece,(King, Tile))):
+                    flag2 = False
+        
+    print (flag1,flag1_1, flag2)
     return (flag1 and flag1_1) or flag2
     
 def check_promotions(board, color):
     if color == 0:
-        for i in range (0,8):
+        for i in range (0,SIZE_H):
             if isinstance(board[0][i], Pawn):
                 add_piece(board,Queen(0,i,0,board))
     elif color == 1:
-        for i in range (0,8):
+        for i in range (0,SIZE_H):
             if isinstance(board[7][i], Pawn):
                 add_piece(board,Queen(1,i,7,board))
 """
 Functions for when king is in check-state
 """    
 def is_black_in_check(board):  #returns a bool, True if in check. 
-    for row in range(0, 8):
-        for col in range(0, 8):
+    for row in range(0, SIZE_V):
+        for col in range(0, SIZE_H):
             if board[row][col].color == 0:
                 board[row][col].find_poss_moves()
                 if black_king_pos in board[row][col].poss_captures:
@@ -816,8 +858,8 @@ def is_black_in_check(board):  #returns a bool, True if in check.
     return False
 
 def is_white_in_check(board):  #returns a bool, True if in check. 
-    for row in range(0, 8):
-        for col in range(0, 8):
+    for row in range(0, SIZE_V):
+        for col in range(0, SIZE_H):
             if board[row][col].color == 1:
                 board[row][col].find_poss_moves()
                 if white_king_pos in board[row][col].poss_captures:
@@ -830,8 +872,8 @@ def can_white_block(board): #called when white is in check. Corrects piece moves
     return_val = False
     moves_to_remove = []
     captures_to_remove = []
-    for row in range(0,8):
-        for col in range(0,8):
+    for row in range(0,SIZE_V):
+        for col in range(0,SIZE_H):
             piece = board[row][col]
             if piece.color == 0 and not(isinstance(piece, King)):
                 for i in range (len(piece.poss_moves)):
@@ -844,8 +886,8 @@ def can_white_block(board): #called when white is in check. Corrects piece moves
                 moves_to_remove = []
                 if piece.poss_moves != []:
                     return_val = True
-    for row in range(0,8):
-        for col in range(0,8):
+    for row in range(0,SIZE_V):
+        for col in range(0,SIZE_H):
             if board[row][col].color == 0 and not(isinstance(board[row][col], King)):
                 piece = board[row][col]
                 for i in range (len(piece.poss_captures)):
@@ -867,8 +909,8 @@ def can_black_block(board): #called when black is in check. Corrects piece moves
     return_val = False
     moves_to_remove = []
     captures_to_remove = []
-    for row in range(0,8):
-        for col in range(0,8):
+    for row in range(0,SIZE_V):
+        for col in range(0,SIZE_H):
             piece = board[row][col]
             if piece.color == 1 and not(isinstance(piece, King)):
                 for i in range (len(piece.poss_moves)):
@@ -881,8 +923,8 @@ def can_black_block(board): #called when black is in check. Corrects piece moves
                 moves_to_remove = []
                 if piece.poss_moves != []:
                     return_val = True
-    for row in range(0,8):
-        for col in range(0,8):
+    for row in range(0,SIZE_V):
+        for col in range(0,SIZE_H):
             if board[row][col].color == 1 and not(isinstance(board[row][col], King)):
                 piece = board[row][col]
                 for i in range (len(piece.poss_captures)):
@@ -903,6 +945,7 @@ def can_black_block(board): #called when black is in check. Corrects piece moves
 def is_white_checkmate(board):
     if is_white_in_check(board) == True:
         king = board[white_king_pos[1]][white_king_pos[0]]
+        king.find_poss_moves()
         legal_king_moves(board, king)
         if king.poss_moves == [] and king.poss_captures == [] and (not can_white_block(board)):
             return True
@@ -917,10 +960,10 @@ def is_black_checkmate(board):
             return True
     return False
 
-def init(board):    #Corrects the king position variables.
+def init(board):    #Corrects the king position variables, pawn variables.
     global white_king_pos, black_king_pos
-    for row in range(0,8):
-        for col in range(0,8):
+    for row in range(0,SIZE_V):
+        for col in range(0,SIZE_H):
             piece = board[row][col]
             if isinstance(piece, Pawn):
                 if piece.color == 0:
@@ -938,11 +981,6 @@ def init(board):    #Corrects the king position variables.
 """
 Stockfish initialization
 """
-
-global white_ai_skill   #values range from 1-20, 1 being the worst. 
-global black_ai_skill
-white_ai_skill = 15
-black_ai_skill = 14
 
 system = platform.system()
 if (system == "Windows"):
@@ -980,27 +1018,6 @@ def move_to_tuple(color, move):    #returns piece location, and piece move locat
     return (ret1,8-ret2), (ret3,8-ret4)
 
 def board_to_fen(board, color):
-    # if (isinstance(board[0][0], Rook)):
-    #     if board[0][0].has_moved == False:
-    #         qrook = True
-    #     else:
-    #         qrook = False
-    # if (isinstance(board[0][0], Rook)):
-    #     if board[0][0].has_moved == False:
-    #         krook = True
-    #     else:
-    #         krook = False
-    # if (isinstance(board[0][0], Rook)):
-    #     if board[0][0].has_moved == False:
-    #         Qrook = True
-    #     else:
-    #         Qrook = False
-    # if (isinstance(board[0][0], Rook)):
-    #     if board[0][0].has_moved == False:
-    #         Krook = True
-    #     else:
-    #         Krook = False
-
     str_ret = ""
     temp = 0
     for i in range (0,8):
@@ -1057,7 +1074,7 @@ def board_to_fen(board, color):
             elif isinstance(piece, King):
                 if temp != 0:
                     str_ret += str(temp)
-                    temp = 0
+                    temp = Rook
                 if piece.color == 1:
                     str_ret += 'k'
                 elif piece.color == 0:
@@ -1073,19 +1090,6 @@ def board_to_fen(board, color):
         str_ret += " b "
 
     str_ret += "-"
-    # king = board[white_king_pos[1]][white_king_pos[0]]
-    # if king.has_moved == False:
-    #     if Krook == True:
-    #        str_ret += 'K'
-    #     if Qrook == True:
-    #         str_ret += 'Q'
-
-    # king = board[black_king_pos[1]][black_king_pos[0]]
-    # if king.has_moved == False:
-    #     if krook == True:
-    #        str_ret += 'k'
-    #     if qrook == True:
-    #         str_ret += 'q'
 
     str_ret += " - 0 0"
     return str_ret
@@ -1105,14 +1109,14 @@ def fen_to_board(fen):
                     new_j += val
                 elif char == 'r':
                     if (j,i) == (0,7) or (j,i) == (0,0):
-                        board[i][new_j] = Rook(1,new_j,i,board,False)
+                        board[i][new_j] = Rook(1,new_j,i,board)
                     else:
-                        board[i][new_j] = Rook(1,new_j,i,board,True)
+                        board[i][new_j] = Rook(1,new_j,i,board)
                 elif char == 'R':
                     if (j,i) == (7,7) or (j,i) == (7,0):
-                        board[i][new_j] = Rook(0,new_j,i,board,False)
+                        board[i][new_j] = Rook(0,new_j,i,board)
                     else:
-                        board[i][new_j] = Rook(0,new_j,i,board,True)
+                        board[i][new_j] = Rook(0,new_j,i,board)
 
                 elif char == 'p':
                     board[i][new_j] = Pawn(1,new_j,i,board)

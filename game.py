@@ -12,8 +12,7 @@ global state #variable to track state of the game
 state = 0
 game_over_id = -1
 
-white_ai_switch = False
-black_ai_switch = True
+
 
 def initialize_game():
     global state
@@ -122,6 +121,7 @@ def white_move_check():
     global state
     global game_over_id
     find_all_poss_moves(board)
+    legal_king_moves(board,0)
     val = is_white_checkmate(board)
     if (val == True):
         game_over_id = 2
@@ -158,6 +158,7 @@ def black_move_check():
     global state
     global game_over_id
     find_all_poss_moves(board)
+    legal_king_moves(board,1)
     val = is_black_checkmate(board)
     if (val == True):
         game_over_id = 2
