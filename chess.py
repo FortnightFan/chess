@@ -11,25 +11,22 @@ Parameters that need to be initialized prior to runtime. Via on-board I/O
 These values should be able to be updated in real-time. This can be accomplished by creating a thread via python "import threading" that runs an inf while loop and reads input from the external IO.
 """
 
-global SIZE_H
-global SIZE_V
-
-SIZE_H = 3
-SIZE_V = 3
+global white_ai_switch
+global black_ai_switch
 
 global white_ai_skill   #values range from 1-20, 1 being the worst. 
 global black_ai_skill
 
-global SKILL_LOW
-global SKILL_MEDIUM
-global SKILL_HIGH
+global SIZE_H
+global SIZE_V
 
 SKILL_LOW = 5
 SKILL_MEDIUM = 10
 SKILL_HIGH = 18
 
-global white_ai_switch
-global black_ai_switch
+SIZE_H = 3
+SIZE_V = 3
+
 
 white_ai_switch = True
 black_ai_switch = True
