@@ -11,25 +11,13 @@ Parameters that need to be initialized prior to runtime. Via on-board I/O
 These values should be able to be updated in real-time. This can be accomplished by creating a thread via python "import threading" that runs an inf while loop and reads input from the external IO.
 """
 
-global SIZE_H
-global SIZE_V
+SIZE_H = 8
+SIZE_V = 8
 
-SIZE_H = 3
-SIZE_V = 3
-
-global white_ai_skill   #values range from 1-20, 1 being the worst. 
-global black_ai_skill
-
-global SKILL_LOW
-global SKILL_MEDIUM
-global SKILL_HIGH
-
+#values range from 1-20, 1 being the worst. 
 SKILL_LOW = 5
 SKILL_MEDIUM = 10
 SKILL_HIGH = 18
-
-global white_ai_switch
-global black_ai_switch
 
 white_ai_switch = True
 black_ai_switch = True
@@ -44,8 +32,6 @@ Chess classes
 
 board = [[0 for _ in range(SIZE_H)] for _ in range(SIZE_V)]
 
-
-print(board)
 global white_king_pos
 global black_king_pos
 white_king_pos = (4,7)
@@ -634,7 +620,7 @@ def find_all_poss_moves(board):
     clear_all_lists(board)
     for row in range (0,SIZE_V):
         for col in range (0,SIZE_H):
-            if not isinstance(board[row][col], Tile):
+            if not isinstance(board[row][col], Tile):   #Possibly remove for optimization
                 board[row][col].find_poss_moves()
 
 def clear_all_lists(board):
@@ -808,11 +794,11 @@ def is_white_stalemate(board):
             if (piece.color == 0):
                 if ((piece.poss_moves != [] or piece.poss_captures != []) and not isinstance(piece, King)):
                     flag1 = False
-                if (not isinstance(piece,(King, Tile))):
-                    flag2 = False
+                # if (not isinstance(piece,(King, Tile))):
+                #     flag2 = False
     
-    print (flag1,flag1_1, flag2)
-    return (flag1 and flag1_1) or flag2
+    print (flag1,flag1_1)
+    return (flag1 and flag1_1)
     
         
 def is_black_stalemate(board):
@@ -828,11 +814,11 @@ def is_black_stalemate(board):
             if (piece.color == 1):
                 if ((piece.poss_moves != [] or piece.poss_captures != []) and not isinstance(piece, King)):
                     flag1 = False
-                if (not isinstance(piece,(King, Tile))):
-                    flag2 = False
+                # if (not isinstance(piece,(King, Tile))):    #If there's a non-king piece, its not checkmate
+                #     flag2 = False
         
-    print (flag1,flag1_1, flag2)
-    return (flag1 and flag1_1) or flag2
+    print (flag1,flag1_1)
+    return (flag1 and flag1_1)
     
 def check_promotions(board, color):
     if color == 0:
@@ -1135,15 +1121,15 @@ def fen_to_board(fen):
             
                 elif char == 'k':
                     if (j,i) != (4,0):
-                        board[i][new_j] = King(1,new_j,i,board,True)
+                        board[i][new_j] = King(1,new_j,i,board)
                     else:
-                        board[i][new_j] = King(1,new_j,i,board,False)
+                        board[i][new_j] = King(1,new_j,i,board)
                     black_king_pos = (j,i)
                 elif char == 'K':
                     if (j,i) != (4,7):
-                        board[i][new_j] = King(0,new_j,i,board,True)
+                        board[i][new_j] = King(0,new_j,i,board)
                     else:
-                        board[i][new_j] = King(0,new_j,i,board,False)
+                        board[i][new_j] = King(0,new_j,i,board)
                     white_king_pos = (new_j,i)
 
                 elif char == 'q':
