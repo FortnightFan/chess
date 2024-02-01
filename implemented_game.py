@@ -2,13 +2,7 @@ import chess
 import serial
 import threading
 import time
-"""
-Find difficulty values of AI. 
-    - OFF
-    - EASY      - Skill = 5
-    - NORMAL    - Skill = 10
-    - HARD      - Skill = 18
-"""
+import queue
 
 EASY = 5
 NORMAL = 10
@@ -24,39 +18,94 @@ Black_AI = {
     'difficulty'    :   EASY
 }
 
+Button_Pressed = False
+
+White_Pieces = {
+    ''   :  chess.Pawn(0,0,0,chess.board),
+    ''   :  chess.Pawn(0,0,0,chess.board),
+    ''   :  chess.Pawn(0,0,0,chess.board),
+    ''   :  chess.Pawn(0,0,0,chess.board),
+    ''   :  chess.Pawn(0,0,0,chess.board),
+    ''   :  chess.Pawn(0,0,0,chess.board),
+    ''   :  chess.Pawn(0,0,0,chess.board),
+    ''   :  chess.Pawn(0,0,0,chess.board),
+    ''   :  chess.Queen(0,0,0,chess.board),
+    ''   :  chess.King(0,0,0,chess.board),
+    ''   :  chess.Horse(0,0,0,chess.board),
+    ''   :  chess.Horse(0,0,0,chess.board),
+    ''   :  chess.Bishop(0,0,0,chess.board),
+    ''   :  chess.Bishop(0,0,0,chess.board),
+    ''   :  chess.Rook(0,0,0,chess.board),
+    ''   :  chess.Rook(0,0,0,chess.board)
+}
+
+Black_Pieces = {
+    ''   :  chess.Pawn(1,0,0,chess.board),
+    ''   :  chess.Pawn(1,0,0,chess.board),
+    ''   :  chess.Pawn(1,0,0,chess.board),
+    ''   :  chess.Pawn(1,0,0,chess.board),
+    ''   :  chess.Pawn(1,0,0,chess.board),
+    ''   :  chess.Pawn(1,0,0,chess.board),
+    ''   :  chess.Pawn(1,0,0,chess.board),
+    ''   :  chess.Pawn(1,0,0,chess.board),
+    ''   :  chess.Queen(1,0,0,chess.board),
+    ''   :  chess.King(1,0,0,chess.board),
+    ''   :  chess.Horse(1,0,0,chess.board),
+    ''   :  chess.Horse(1,0,0,chess.board),
+    ''   :  chess.Bishop(1,0,0,chess.board),
+    ''   :  chess.Bishop(1,0,0,chess.board),
+    ''   :  chess.Rook(1,0,0,chess.board),
+    ''   :  chess.Rook(1,0,0,chess.board)
+}
+
+Piece_Queue = queue.Queue()
+
 """
 Initialization function
 Modifies variables
     -ser1,ser2,ser3
+    -reader_thread_1,reader_thread_2,reader_thread_3
 """
 ser1,ser2,ser3 = None,None,None
+reader_thread_1,reader_thread_2,reader_thread_3 = None,None,None
+
 def ready():
     global ser1,ser2,ser3
+    global reader_thread_1,reader_thread_2,reader_thread_3
+    
     #Arduino serial ports and threads
     try:
         ser1 = serial.Serial('/dev/ttyUSB0',9600)
-        ser2 = serial.Serial('/dev/ttyUSB1',9600)
-        ser3 = serial.Serial('/dev/ttyUSB2',9600)
-        print("Serial ports successfully connected.")
+        reader_thread_1 = threading.Thread(target=read_port_1)
+        reader_thread_1.daemon = True
+        print("Serial port 1 successfully connected.")
     except:
-        print("ERROR: Serial port(s) not found")
-
-    reader_thread_1 = threading.Thread(target=read_port_1)
-    reader_thread_1.daemon = True
-    reader_thread_2 = threading.Thread(target=read_port_2)
-    reader_thread_2.daemon = True
-    reader_thread_3 = threading.Thread(target=read_port_3)
-    reader_thread_3.daemon = True
+        print("ERROR: Serial port 1 not found")
+    try:
+        ser2 = serial.Serial('/dev/ttyUSB1',9600)
+        reader_thread_2 = threading.Thread(target=read_port_2)
+        reader_thread_2.daemon = True
+        print("Serial port 2 successfully connected.")
+    except:
+        print("ERROR: Serial port 2 not found")
+    try:
+        ser3 = serial.Serial('/dev/ttyUSB2',9600)
+        reader_thread_3 = threading.Thread(target=read_port_3)
+        reader_thread_3.daemon = True
+        print("Serial port 3 successfully connected.")
+    except:
+        print("ERROR: Serial port 3 not found")
     
-    io_thread = threading.Thread(target=io_control)    
+    if reader_thread_1 != None:
+        reader_thread_1.start()
+    if reader_thread_2 != None:
+        reader_thread_2.start()
+    if reader_thread_3 != None:
+        reader_thread_3.start()
         
-    # game_thread = threading.Thread(target=game_control)
-    
-    reader_thread_1.start()
-    reader_thread_2.start()
-    reader_thread_3.start()
+    io_thread = threading.Thread(target=io_control)    
+    io_thread.daemon = True
     io_thread.start()
-    # game_thread.start()
 
 def exit():    
     try:
@@ -85,7 +134,7 @@ def read_port_1():
         try:
             data = ser1.readline().decode('ascii').strip()
             reader,data = deserialize(data)
-            print(f"Reader: {int(reader)+2}\nData: {data}")
+            print(f"Reader: {int(reader)}\nData: {data}")
             ser1.flushInput()
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
@@ -141,7 +190,9 @@ Modifies variables:
 def io_control():
     while True:
         time.sleep(0.25)
-    pass    
+    #     when button is pressed
+    #         print(1)
+    # pass    
 
 game_state_dict = {
         "White_turn" : 0,
@@ -156,11 +207,19 @@ game_state_dict = {
     }
 game_state = game_state_dict["White_turn"]
 
+def board_setup():
+    global reader_board_mem
+    while(True):
+        UID = Piece_Queue.get()
+        if UID in reader_board_mem:
+            pass
+        time.sleep(1)
+        pass
+
 def game_control():    
-    time.sleep(5)   #Get board readings
     chess.board = reader_board_mem
     board_mem = reader_board_mem
-    
+    print("End")
     # chess.fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
     # while(1):
     #     chess.print_board(chess.board)
@@ -168,5 +227,7 @@ def game_control():
 
 if __name__ == "__main__":
     ready()
+    board_setup()
     game_control()
+    exit()
     pass
