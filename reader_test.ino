@@ -41,18 +41,15 @@
 bool piece_on = false;
 String serialized_data = "";
 
-MFRC522 mfrc522_1;   // Create MFRC522 instance.
-MFRC522 mfrc522_2;
+MFRC522 mfrc522_1(SS_1_PIN,RST_PIN);   // Create MFRC522 instance.
+MFRC522 mfrc522_2(SS_2_PIN,RST_PIN);
 
-/**
- * Initialize.
- */
 void setup() {
   Serial.begin(9600); // Initialize serial communications with the PC
   SPI.begin();        // Init SPI bus
 
-  mfrc522_1.PCD_Init(SS_1_PIN,RST_PIN);
-  mfrc522_2.PCD_Init(SS_2_PIN,RST_PIN);
+  mfrc522_1.PCD_Init();
+  mfrc522_2.PCD_Init();
 }
 
 unsigned long getID(MFRC522 mfrc522){
@@ -66,29 +63,37 @@ unsigned long getID(MFRC522 mfrc522){
 
 void reader_1()
 {
-  if (mfrc522_1.PICC_IsNewCardPresent()) {
-      if (mfrc522_1.PICC_ReadCardSerial()) {
-        serialized_data += "1/" + String(getID(mfrc522_1)) + " ";
-    }
+  if (!mfrc522_1.PICC_IsNewCardPresent()) {
+    return;
   }
+  if (!mfrc522_1.PICC_ReadCardSerial()) {
+    return;
+  }
+  serialized_data += "1/" + String(getID(mfrc522_1)) + " ";
 }
 
 void reader_2()
 {
-  if (mfrc522_2.PICC_IsNewCardPresent()) {
-      if (mfrc522_2.PICC_ReadCardSerial()) {
-        serialized_data += "2/" + String(getID(mfrc522_2)) + " ";
-    }
+  if (!mfrc522_2.PICC_IsNewCardPresent()) {
+    return;
   }
+  if (!mfrc522_2.PICC_ReadCardSerial()) {
+    return;
+  }
+  serialized_data += "2/" + String(getID(mfrc522_2)) + " ";
 }
 void loop() 
 {
-  serialized_data = "_";
+  serialized_data = "";
   reader_1();
   reader_2();
 
-  Serial.println(serialized_data);
   delay(500);
+  if (serialized_data != "")
+  {
+    Serial.print(serialized_data);
+    Serial.println("");
+  }
 }
 
 /**

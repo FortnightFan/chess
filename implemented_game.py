@@ -75,21 +75,26 @@ def ready():
     
     #Arduino serial ports and threads
     try:
-        ser1 = serial.Serial('/dev/ttyUSB0',9600)
+        ser1 = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
+        reader_thread_1 = threading.Thread(target=read_port_1)
+        reader_thread_1.daemon = True
+        print("Serial port 1 successfully connected.")
+    except serial.SerialException:
+        ser1 = serial.Serial('COM4', 9600,timeout=1)
         reader_thread_1 = threading.Thread(target=read_port_1)
         reader_thread_1.daemon = True
         print("Serial port 1 successfully connected.")
     except:
         print("ERROR: Serial port 1 not found")
     try:
-        ser2 = serial.Serial('/dev/ttyUSB1',9600)
+        ser2 = serial.Serial('/dev/ttyUSB1',9600,timeout=1)
         reader_thread_2 = threading.Thread(target=read_port_2)
         reader_thread_2.daemon = True
         print("Serial port 2 successfully connected.")
     except:
         print("ERROR: Serial port 2 not found")
     try:
-        ser3 = serial.Serial('/dev/ttyUSB2',9600)
+        ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1),
         reader_thread_3 = threading.Thread(target=read_port_3)
         reader_thread_3.daemon = True
         print("Serial port 3 successfully connected.")
@@ -125,25 +130,29 @@ Modifies variables:
 reader_board_mem = chess.board  #Variable that stores immediate reference data of on-board pieces.
 
 def deserialize (serialized_data):
-    ser_data = serialized_data.split("/")
-    return ser_data[0],ser_data[1]
+    ret_list = ["","","","","","",""]
+    ser_data = serialized_data.split(" ")
+    for i in range (0,len(ser_data)):
+        tup = ser_data[i].split("/")
+        ret_list[int(tup[0])-1] = tup[1]
+    return ret_list
 
 def read_port_1():
     global reader_board_mem
     while True:
         try:
-            data = ser1.readline().decode('ascii').strip()
-            reader,data = deserialize(data)
-            print(f"Reader: {int(reader)}\nData: {data}")
-            ser1.flushInput()
+            data = ser1.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data)
+                print(data)
+                ser1.flushInput()
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
-        except:
-            print("ERROR: Signal downlink 1")
-            time.sleep(3)
+        except Exception as e:
+            print(f"ERROR: {e}")
         finally:
             time.sleep(0.25)
-    pass
+
 def read_port_2():
     global reader_board_mem
     while True:
@@ -227,7 +236,7 @@ def game_control():
 
 if __name__ == "__main__":
     ready()
-    board_setup()
-    game_control()
+    time.sleep(20)    
     exit()
     pass
+
