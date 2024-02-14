@@ -2,7 +2,8 @@ import chess
 import serial
 import threading
 import time
-import queue
+# import queue
+import copy
 
 EASY = 5
 NORMAL = 10
@@ -58,8 +59,6 @@ Black_Pieces = {
     ''   :  chess.Rook(1,0,0,chess.board)
 }
 
-Piece_Queue = queue.Queue()
-
 """
 Initialization function
 Modifies variables
@@ -79,11 +78,11 @@ def ready():
         reader_thread_1 = threading.Thread(target=read_port_1)
         reader_thread_1.daemon = True
         print("Serial port 1 successfully connected.")
-    except serial.SerialException:
-        ser1 = serial.Serial('COM4', 9600,timeout=1)
-        reader_thread_1 = threading.Thread(target=read_port_1)
-        reader_thread_1.daemon = True
-        print("Serial port 1 successfully connected.")
+    # except serial.SerialException:
+    #     ser1 = serial.Serial('COM4', 9600,timeout=1)
+    #     reader_thread_1 = threading.Thread(target=read_port_1)
+    #     reader_thread_1.daemon = True
+    #     print("Serial port 1 successfully connected.")
     except:
         print("ERROR: Serial port 1 not found")
     try:
@@ -127,10 +126,10 @@ Arduino/RFID Reader Functions
 Modifies variables:
     -reader_board_mem
 """
-reader_board_mem = chess.board  #Variable that stores immediate reference data of on-board pieces.
-
+reader_board_mem = [["" for _ in range(8)] for _ in range(8)]  #Variable that stores immediate reference data of on-board pieces. Updated constantly.
+internal_board_mem = copy.deepcopy(reader_board_mem) #Variable that references the reader board for logic. Updated only on events
 def deserialize (serialized_data):
-    ret_list = ["","","","","","",""]
+    ret_list = ["","","","","","","",""]
     ser_data = serialized_data.split(" ")
     for i in range (0,len(ser_data)):
         tup = ser_data[i].split("/")
@@ -145,6 +144,8 @@ def read_port_1():
             if data:   
                 data = deserialize(data)
                 print(data)
+                for i in range (0,8):
+                    reader_board_mem[0][i] = data[i]
                 ser1.flushInput()
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
@@ -157,37 +158,30 @@ def read_port_2():
     global reader_board_mem
     while True:
         time.sleep(0.25)
-    pass
 def read_port_3():
     global reader_board_mem
     while True:
         time.sleep(0.25)
-    pass
 def read_port_4():
     global reader_board_mem
     while True:
         time.sleep(0.25)
-    pass
 def read_port_5():
     global reader_board_mem
     while True:
         time.sleep(0.25)
-    pass
 def read_port_6():
     global reader_board_mem
     while True:
         time.sleep(0.25)
-    pass
 def read_port_7():
     global reader_board_mem
     while True:
         time.sleep(0.25)
-    pass
 def read_port_8():
     global reader_board_mem
     while True:
         time.sleep(0.25)
-    pass
 
 """
 Controls on-board buttons, switches, etc. 
@@ -199,44 +193,145 @@ Modifies variables:
 def io_control():
     while True:
         time.sleep(0.25)
-    #     when button is pressed
-    #         print(1)
-    # pass    
 
-game_state_dict = {
-        "White_turn" : 0,
-        "Black_turn" : 1,
-        "White_turn_check" : 2,
-        "Black_turn_check" : 3,
-        "White_turn_AI" : 4,
-        "Black_turn_AI" : 5,
-        "White_checkmate" : 6,
-        "Black_checkmate" : 7,
-        "Stalemate" : 8
-    }
-game_state = game_state_dict["White_turn"]
+# game_state_dict = {
+#         "White_turn" : 0,
+#         "Black_turn" : 1,
+#         "White_turn_check" : 2,
+#         "Black_turn_check" : 3,
+#         "White_turn_AI" : 4,
+#         "Black_turn_AI" : 5,
+#         "White_checkmate" : 6,
+#         "Black_checkmate" : 7,
+#         "Stalemate" : 8
+#     }
 
-def board_setup():
-    global reader_board_mem
-    while(True):
-        UID = Piece_Queue.get()
-        if UID in reader_board_mem:
-            pass
-        time.sleep(1)
-        pass
+game_state = 0
 
-def game_control():    
-    chess.board = reader_board_mem
-    board_mem = reader_board_mem
-    print("End")
-    # chess.fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+#State machine that constantly runs. game_state var must be updated within functions.
+def game_control():  
+    global internal_board_mem
+    global reader_board_mem 
+    chess.fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")  #Testing, delete later
+    chess.init(chess.board)
+    while True:
+        internal_board_mem = reader_board_mem
+        match game_state:
+            case 0:
+                white_move()
+            case 1:
+                black_move()
+            case 2:
+                white_move_check()
+            case 3:
+                black_move_check()
+            case 4:
+                white_move_AI()
+            case 5:
+                black_move_AI()
+            case 6:
+                white_checkmate()
+            case 7:
+                black_checkmate()
+            case 8:
+                stalemate()
     # while(1):
     #     chess.print_board(chess.board)
     #     time.sleep(1)
 
+"""
+GAME-LOGIC HELPER FUNCTIONS
+"""
+#Updates the board within the chess class to reflect the value of the matrix
+def update_chess_positions(reader_board_mem):
+    for i in range (0,8):
+        for j in range (0,8):
+            if reader_board_mem[i][j] == "":
+                chess.board[i][j] = chess.tile
+            elif reader_board_mem[i][j] in White_Pieces:
+                chess.move_piece(chess.board, White_Pieces[reader_board_mem[i][j]], (i,j))
+            elif reader_board_mem[i][j] in Black_Pieces:
+                chess.move_piece(chess.board, Black_Pieces[reader_board_mem[i][j]], (i,j))
+                
+#Finds all possible moves on the board specifically for a given piece.
+def chess_piece_logic(piece, color):
+    chess.clear_all_lists(chess.board)
+    chess.find_all_poss_moves(chess.board)
+    chess.legal_king_moves(chess.board, color)
+    chess.check_pin(chess.board, piece)
+
+"""
+Game-state functions
+"""
+def white_move():
+    temp_reader_board_mem = reader_board_mem
+    internal_board_mem = reader_board_mem
+    exit = False
+    
+    global piece
+    piece = chess.tile
+    while True: #Update to button inputs
+        #if button inputs ai or whatever, update state and return
+        while not exit:
+            while (temp_reader_board_mem == internal_board_mem):
+                temp_reader_board_mem = reader_board_mem
+                update_chess_positions(temp_reader_board_mem)
+                time.sleep(0.25)
+
+            for i in range (0,8):
+                for j in range (0,8):
+                    if temp_reader_board_mem[i][j] != internal_board_mem[i][j]:
+                        try:
+                            piece = White_Pieces[internal_board_mem[i][j]]
+                            if piece.color == 0:
+                                exit = True
+                                chess_piece_logic(piece, 0)
+                                print(piece.poss_moves)
+                                #Turn on lights
+                        except:
+                            print("ERROR: Key index not found")
+            
+            #Wait for piece to return to the board. Turn lights back off.
+            #Update internal_board_mem
+            
+        return
+        
+def black_move():
+    pass
+
+def white_move_check():
+    pass
+
+def black_move_check():
+    pass
+
+def white_move_AI():
+    pass
+
+def black_move_AI():
+    pass
+    
+def white_checkmate():
+    pass
+
+def black_checkmate():
+    pass
+
+def stalemate():
+    pass
+  
 if __name__ == "__main__":
-    ready()
-    time.sleep(20)    
-    exit()
+    
+    chess.fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+    chess.print_board(chess.board)
+    chess.init(chess.board)
+
+    reader_board_mem[6][3] = "2109"
+    white_move()
+    # ready()
+    # game_control()
+    # time.sleep(20)    
+    # exit()
+    
     pass
 

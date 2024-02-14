@@ -96,7 +96,7 @@ class Pawn(Piece):      #Possible out of bounds issues if initialized close to t
             if self.xpos == 0 and self.ypos >= 0:               #find possible pawn captures, white
                 if self.board[y-1][x+1].color == 1:
                     self.poss_captures.append((x+1,y-1))
-            if self.xpos == SIZE_H and self.ypos >= 0:
+            elif self.xpos == SIZE_H-1 and self.ypos >= 0:
                 if self.board[y-1][x-1].color == 1:
                     self.poss_captures.append((x-1,y-1))           
             elif self.ypos >= 0:
@@ -116,7 +116,7 @@ class Pawn(Piece):      #Possible out of bounds issues if initialized close to t
             if self.xpos == 0 and self.ypos < SIZE_V:                #find possible pawn captures, white
                 if self.board[y+1][x+1].color == 0:
                     self.poss_captures.append((x+1,y+1))
-            if self.xpos == 7 and self.ypos < SIZE_V:
+            elif self.xpos == SIZE_H-1 and self.ypos < SIZE_V:
                 if self.board[y+1][x-1].color == 0:
                     self.poss_captures.append((x-1,y+1))           
             elif self.ypos < SIZE_V:
@@ -611,9 +611,6 @@ def move_piece(board,piece, pos):  #moves a piece to tuple pos
             white_king_pos = (piece.xpos, piece.ypos)
         elif piece.color == 1:
             black_king_pos = (piece.xpos, piece.ypos)
-                    
-    elif isinstance(piece,(Pawn, Rook)):
-        board[pos[1]][pos[0]].has_moved = True
 
 def find_all_poss_moves(board):
     clear_all_lists(board)
