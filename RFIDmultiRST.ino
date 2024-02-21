@@ -16,12 +16,12 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #define SS_PIN          15        // Any unused digital pin
-#define NR_OF_READERS   4         // How many readers do you have?
+#define NR_OF_READERS   7         // How many readers do you have?
 
 MFRC522 mfrc522[NR_OF_READERS];   // Create MFRC522 instances.
 
 String currentIDs[] = {"00000000", "00000000", "00000000", "00000000"}; // Change if more are needed.
-byte RSTpins[] = {3, 2, 0, 4};                                 // Unique digital pin for each sensor
+byte RSTpins[] = {3, 2, 0, 4, 5, 16, 10};                                 // Unique digital pin for each sensor
 
 void setup() {
   Serial.begin(9600); // Initialize serial communications with the PC
@@ -34,9 +34,9 @@ void loop() {
   for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
     currentIDs[reader] = "00000000";
     digitalWrite(RSTpins[reader], HIGH);                      // Turn on the sensor by setting the RST pin to HIGH
-    delay(25);                                                // Delay could be shortened/removed, test please
+    delay(40);                                                // Delay could be shortened/removed, test please
     mfrc522[reader].PCD_Init(SS_PIN, RSTpins[reader]);        // Init each MFRC522 card
-    delay(25);                                                // Delay could be shortened/removed, test please
+    delay(40);                                                // Delay could be shortened/removed, test please
     if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial()) {
       currentIDs[reader] = getCode(mfrc522[reader].uid.uidByte, mfrc522[reader].uid.size);
       mfrc522[reader].PICC_HaltA();                           // Stop reading
