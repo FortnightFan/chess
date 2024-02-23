@@ -21,8 +21,8 @@ SKILL_HIGH = 18
 white_ai_switch = True
 black_ai_switch = True
 
-white_ai_skill = SKILL_LOW
-black_ai_skill = SKILL_HIGH
+white_ai_skill = 10
+black_ai_skill = 10
         
         
 """
@@ -1147,5 +1147,4 @@ def get_best_move(board, color):
     elif color == 1:
         stockfish.set_skill_level(black_ai_skill)
     move = stockfish.get_best_move()
-    print(move)
     return move, move_to_tuple(color, move)

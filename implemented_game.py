@@ -62,15 +62,15 @@ Black_Pieces = {
 """
 Initialization function
 Modifies variables
-    -ser1,ser2,ser3
-    -reader_thread_1,reader_thread_2,reader_thread_3
+    -ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
+    -reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,reader_thread_6,reader_thread_7,reader_thread_8
 """
-ser1,ser2,ser3 = None,None,None
-reader_thread_1,reader_thread_2,reader_thread_3 = None,None,None
+ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8 = None,None,None,None,None,None,None,None
+reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,reader_thread_6,reader_thread_7,reader_thread_8 = None,None,None,None,None,None,None,None
 
 def ready():
-    global ser1,ser2,ser3
-    global reader_thread_1,reader_thread_2,reader_thread_3
+    global ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
+    global reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,reader_thread_6,reader_thread_7,reader_thread_8
     
     #Arduino serial ports and threads
     try:
@@ -115,7 +115,7 @@ def exit():
     try:
         ser1.close()
         ser2.close()
-        ser3.close()
+        ser2.close()
         print("Serial ports successfully closed.")
     except:
         print("ERROR: Port(s) not found") 
@@ -128,6 +128,7 @@ Modifies variables:
 """
 reader_board_mem = [["" for _ in range(8)] for _ in range(8)]  #Variable that stores immediate reference data of on-board pieces. Updated constantly.
 internal_board_mem = copy.deepcopy(reader_board_mem) #Variable that references the reader board for logic. Updated only on events
+
 def deserialize (serialized_data):
     ret_list = ["","","","","","","",""]
     ser_data = serialized_data.split(" ")
@@ -190,9 +191,55 @@ Modifies variables:
     -Black_AI
     -game_state
 """
+   
+import GPIO #dummy import for testing
+BUTTON = False
+#import RPi.GPIO as GPIO
 def io_control():
-    while True:
-        time.sleep(0.25)
+    global BUTTON
+    global game_state
+    GPIO.setmode(GPIO.BCM)
+    button_pin = 18  # Example GPIO pin
+    GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    button_pressed_time = None
+    difficulty_levels = ["OFF", EASY, NORMAL, HARD]
+    black_difficulty = 0    #Index
+    white_difficulty = 0    #index
+    try:
+        while True:
+            if GPIO.input(button_pin) == GPIO.LOW:  # Button pressed
+                if button_pressed_time is None:
+                    button_pressed_time = time.time()
+            else:
+                if button_pressed_time is not None:
+                    press_duration = time.time() - button_pressed_time
+                    if press_duration < 1:
+                        # Short press - toggle game state
+                        if game_state == 0 or game_state == 2 or game_state == 4: #If white's turn
+                            print("Black turn")
+                            BUTTON = True
+                        elif game_state == 1 or game_state == 3 or game_state == 5: #If black's turn
+                            print("White turn")
+                            BUTTON = True
+                    else:
+                        # Long press - change difficulty
+                        if game_state == 0 or game_state == 2 or game_state == 4: #If white's turn
+                            white_difficulty = (white_difficulty + 1) % len(difficulty_levels)
+                            if type(white_difficulty) == int:
+                                White_AI['difficulty'] = difficulty_levels[white_difficulty]
+                                White_AI['switch'] = True
+                            else:
+                                White_AI['switch'] = False
+                        elif game_state == 1 or game_state == 3 or game_state == 5: #If black's turn
+                            black_difficulty = (black_difficulty + 1) % len(difficulty_levels)
+                            if type(black_difficulty) == int:
+                                Black_AI['difficulty'] = difficulty_levels[black_difficulty]
+                                Black_AI['switch'] = True
+                    button_pressed_time = None  # Reset timer
+            time.sleep(0.1)
+    finally:
+        GPIO.cleanup() 
+
 
 # game_state_dict = {
 #         "White_turn" : 0,
@@ -219,8 +266,22 @@ def game_control():
         match game_state:
             case 0:
                 white_move()
+                chess.clear_all_lists(chess.board)
+                if Black_AI['switch']:
+                    game_state = 5
+                elif chess.is_black_in_check(chess.board):
+                    game_state = 3
+                else:
+                    game_state = 1
             case 1:
                 black_move()
+                chess.clear_all_lists(chess.board)
+                if White_AI['switch']:
+                    game_state = 4
+                elif chess.is_black_in_check(chess.board):
+                    game_state = 2
+                else:
+                    game_state = 0
             case 2:
                 white_move_check()
             case 3:
@@ -235,6 +296,11 @@ def game_control():
                 black_checkmate()
             case 8:
                 stalemate()
+            
+            
+            
+            #Game logic to determine next state val
+            
     # while(1):
     #     chess.print_board(chess.board)
     #     time.sleep(1)
@@ -264,24 +330,50 @@ def chess_piece_logic(piece, color):
 Game-state functions
 """
 def white_move():
+    global BUTTON
+    global game_state
     temp_reader_board_mem = reader_board_mem
     internal_board_mem = reader_board_mem
     exit = False
     
     global piece
+    global piece_ID
+    piece_ID = {
+        'UID' : "00000000",
+        'pos' : (-1,-1)
+    }
     piece = chess.tile
-    while True: #Update to button inputs
-        #if button inputs ai or whatever, update state and return
+    while True:
+        #State 1: Monitor board state, check button state
+        while (temp_reader_board_mem == internal_board_mem):
+            temp_reader_board_mem = reader_board_mem
+            update_chess_positions(temp_reader_board_mem)
+            time.sleep(0.25)
+            #If button is pressed, return.
+            if BUTTON == True:
+                if White_AI['switch']:
+                    game_state = 4
+                    return
+                else:
+                    BUTTON = False
+                    return
+                
+        #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
+        exit = False
         while not exit:
-            while (temp_reader_board_mem == internal_board_mem):
-                temp_reader_board_mem = reader_board_mem
-                update_chess_positions(temp_reader_board_mem)
-                time.sleep(0.25)
-
+            if BUTTON == True:
+                if White_AI['switch']:
+                    game_state = 4
+                    return
+                else:
+                    BUTTON = False
+                    return
             for i in range (0,8):
                 for j in range (0,8):
                     if temp_reader_board_mem[i][j] != internal_board_mem[i][j]:
                         try:
+                            piece_ID['UID'] = internal_board_mem[i][j]
+                            piece_ID['pos'] = (i,j)
                             piece = White_Pieces[internal_board_mem[i][j]]
                             if piece.color == 0:
                                 exit = True
@@ -290,11 +382,21 @@ def white_move():
                                 #Turn on lights
                         except:
                             print("ERROR: Key index not found")
-            
-            #Wait for piece to return to the board. Turn lights back off.
-            #Update internal_board_mem
-            
-        return
+                                
+        #State 3: Monitor board state, look for the lifted piece. 
+        while (not (piece_ID['UID'] in temp_reader_board_mem)):
+            temp_reader_board_mem = reader_board_mem
+            update_chess_positions(temp_reader_board_mem)
+            time.sleep(0.25)
+            #If button is pressed, return.
+            if BUTTON == True:
+                if White_AI['switch']:
+                    game_state = 4
+                    return
+                else:
+                    BUTTON = False
+                    return
+        update_chess_positions(temp_reader_board_mem)
         
 def black_move():
     pass
@@ -306,7 +408,22 @@ def black_move_check():
     pass
 
 def white_move_AI():
-    pass
+    global BUTTON
+    global internal_board_mem
+    internal_board_mem = reader_board_mem
+    update_chess_positions(internal_board_mem)
+    chess.white_ai_skill = White_AI['difficulty']
+    move,tup = chess.get_best_move(chess.board, 0)
+    print (tup)
+    #Turn on light
+    while True:
+        if BUTTON == True:
+            if White_AI['switch']:
+                return
+            else:
+                BUTTON = False
+                return
+    
 
 def black_move_AI():
     pass
