@@ -78,11 +78,7 @@ def ready():
         reader_thread_1 = threading.Thread(target=read_port_1)
         reader_thread_1.daemon = True
         print("Serial port 1 successfully connected.")
-    # except serial.SerialException:
-    #     ser1 = serial.Serial('COM4', 9600,timeout=1)
-    #     reader_thread_1 = threading.Thread(target=read_port_1)
-    #     reader_thread_1.daemon = True
-    #     print("Serial port 1 successfully connected.")
+        reader_thread_1.start()
     except:
         print("ERROR: Serial port 1 not found")
     try:
@@ -90,23 +86,65 @@ def ready():
         reader_thread_2 = threading.Thread(target=read_port_2)
         reader_thread_2.daemon = True
         print("Serial port 2 successfully connected.")
+        reader_thread_2.start()
     except:
         print("ERROR: Serial port 2 not found")
+
     try:
         ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1),
         reader_thread_3 = threading.Thread(target=read_port_3)
         reader_thread_3.daemon = True
         print("Serial port 3 successfully connected.")
+        reader_thread_3.start()
     except:
         print("ERROR: Serial port 3 not found")
     
-    if reader_thread_1 != None:
-        reader_thread_1.start()
-    if reader_thread_2 != None:
-        reader_thread_2.start()
-    if reader_thread_3 != None:
-        reader_thread_3.start()
+    try:
+        ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1),
+        reader_thread_4 = threading.Thread(target=read_port_4)
+        reader_thread_4.daemon = True
+        print("Serial port 4 successfully connected.")
+        reader_thread_4.start()
+    except:
+        print("ERROR: Serial port 4 not found")
+
+    try:
+        ser4 = serial.Serial('/dev/ttyUSB4',9600,timeout=1),
+        reader_thread_5 = threading.Thread(target=read_port_5)
+        reader_thread_5.daemon = True
+        print("Serial port 5 successfully connected.")
+        reader_thread_5.start()
+    except:
+        print("ERROR: Serial port 5 not found")
         
+    try:
+        ser3 = serial.Serial('/dev/ttyUSB5',9600,timeout=1),
+        reader_thread_6 = threading.Thread(target=read_port_3)
+        reader_thread_6.daemon = True
+        print("Serial port 6 successfully connected.")
+        reader_thread_6.start()
+    except:
+        print("ERROR: Serial port 6 not found")
+        
+    try:
+        ser3 = serial.Serial('/dev/ttyUSB6',9600,timeout=1),
+        reader_thread_7 = threading.Thread(target=read_port_3)
+        reader_thread_7.daemon = True
+        print("Serial port 7 successfully connected.")
+        reader_thread_7.start()
+    except:
+        print("ERROR: Serial port 7 not found")
+        
+    try:
+        ser3 = serial.Serial('/dev/ttyUSB7',9600,timeout=1),
+        reader_thread_8 = threading.Thread(target=read_port_3)
+        reader_thread_8.daemon = True
+        print("Serial port 8 successfully connected.")
+        reader_thread_8.start()
+    except:
+        print("ERROR: Serial port 8 not found")
+        
+    #Raspberry pi periferal IO
     io_thread = threading.Thread(target=io_control)    
     io_thread.daemon = True
     io_thread.start()
@@ -332,8 +370,9 @@ Game-state functions
 def white_move():
     global BUTTON
     global game_state
-    temp_reader_board_mem = reader_board_mem
-    internal_board_mem = reader_board_mem
+    with threading.Lock():
+        temp_reader_board_mem = reader_board_mem
+        internal_board_mem = reader_board_mem
     exit = False
     
     global piece
@@ -346,12 +385,14 @@ def white_move():
     while True:
         #State 1: Monitor board state, check button state
         while (temp_reader_board_mem == internal_board_mem):
-            temp_reader_board_mem = reader_board_mem
+            with threading.Lock():
+                temp_reader_board_mem = reader_board_mem
             update_chess_positions(temp_reader_board_mem)
             time.sleep(0.25)
             #If button is pressed, return.
             if BUTTON == True:
                 if White_AI['switch']:
+                    BUTTON = False
                     game_state = 4
                     return
                 else:
@@ -385,12 +426,14 @@ def white_move():
                                 
         #State 3: Monitor board state, look for the lifted piece. 
         while (not (piece_ID['UID'] in temp_reader_board_mem)):
-            temp_reader_board_mem = reader_board_mem
+            with threading.Lock():
+                temp_reader_board_mem = reader_board_mem
             update_chess_positions(temp_reader_board_mem)
             time.sleep(0.25)
             #If button is pressed, return.
             if BUTTON == True:
                 if White_AI['switch']:
+                    BUTTON = False
                     game_state = 4
                     return
                 else:
@@ -410,21 +453,33 @@ def black_move_check():
 def white_move_AI():
     global BUTTON
     global internal_board_mem
-    internal_board_mem = reader_board_mem
+    global game_state
+    with threading.Lock():
+        internal_board_mem = reader_board_mem
     update_chess_positions(internal_board_mem)
     chess.white_ai_skill = White_AI['difficulty']
     move,tup = chess.get_best_move(chess.board, 0)
     print (tup)
     #Turn on light
     while True:
-        if BUTTON == True:
-            if White_AI['switch']:
-                return
-            else:
-                BUTTON = False
-                return
+        #State 1: Monitor board state, check button state
+        while (temp_reader_board_mem == internal_board_mem):
+            with threading.Lock():
+                temp_reader_board_mem = reader_board_mem
+            update_chess_positions(temp_reader_board_mem)
+            time.sleep(0.25)
+            #If button is pressed, return.
+            if BUTTON == True:
+                if White_AI['switch']:
+                    BUTTON = False
+                    game_state = 0
+                    return
+                else:
+                    BUTTON = False
+                    return
+                
+    #Turn off light
     
-
 def black_move_AI():
     pass
     
@@ -439,16 +494,16 @@ def stalemate():
   
 if __name__ == "__main__":
     
-    chess.fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    chess.print_board(chess.board)
-    chess.init(chess.board)
+    # chess.fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+    # chess.print_board(chess.board)
+    # chess.init(chess.board)
 
-    reader_board_mem[6][3] = "2109"
-    white_move()
-    # ready()
-    # game_control()
-    # time.sleep(20)    
-    # exit()
+    # reader_board_mem[6][3] = "2109"
+    # white_move()
+    # # ready()
+    # # game_control()
+    # # time.sleep(20)    
+    # # exit()
     
     pass
 
