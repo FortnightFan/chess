@@ -20,8 +20,8 @@
 
 MFRC522 mfrc522[NR_OF_READERS];   // Create MFRC522 instances.
 
-String currentIDs[] = {"00000000", "00000000", "00000000", "00000000"}; // Change if more are needed.
-byte RSTpins[] = {4, 16, 17, 21, 22, 32, 33, 25};                                 // Unique digital pin for each sensor
+String currentIDs[] = {"00000000", "00000000", "00000000", "00000000", "00000000", "00000000", "00000000", "00000000"}; // Change if more are needed.
+byte RSTpins[] = {4, 16, 17, 21, 22, 32, 33, 25};                                // Unique digital pin for each sensor
 
 void setup() {
   Serial.begin(9600); // Initialize serial communications with the PC
@@ -32,6 +32,11 @@ void setup() {
 
 void loop() {
   for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
+    if(RSTpins[reader] == 9){
+      // digitalWrite(9, LOW);
+      // pinMode(9, OUTPUT); // now we're sourcing current, i.e. GND
+      // pinMode(9, INPUT); // now we're tri-stated
+    }
     currentIDs[reader] = "00000000";
     digitalWrite(RSTpins[reader], HIGH);                      // Turn on the sensor by setting the RST pin to HIGH
     delay(40);                                                // Delay could be shortened/removed, test please
