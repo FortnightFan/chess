@@ -387,7 +387,7 @@ def white_move():
         while (temp_reader_board_mem == internal_board_mem):
             with threading.Lock():
                 temp_reader_board_mem = reader_board_mem
-            update_chess_positions(temp_reader_board_mem)
+            update_chess_positions(temp_reader_board_mem)   #Most likely need to move
             time.sleep(0.25)
             #If button is pressed, return.
             if BUTTON == True:

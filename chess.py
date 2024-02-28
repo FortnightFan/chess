@@ -606,7 +606,7 @@ def move_piece(board,piece, pos):  #moves a piece to tuple pos
     add_piece(board, piece)
     board[y][x] = tile
     if isinstance(piece, King):
-        board[pos[1]][pos[0]].has_moved = True
+        # board[pos[1]][pos[0]].has_moved = True
         if piece.color == 0:
             white_king_pos = (piece.xpos, piece.ypos)
         elif piece.color == 1:
