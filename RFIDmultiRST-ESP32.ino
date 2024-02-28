@@ -32,11 +32,6 @@ void setup() {
 
 void loop() {
   for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
-    if(RSTpins[reader] == 9){
-      // digitalWrite(9, LOW);
-      // pinMode(9, OUTPUT); // now we're sourcing current, i.e. GND
-      // pinMode(9, INPUT); // now we're tri-stated
-    }
     currentIDs[reader] = "00000000";
     digitalWrite(RSTpins[reader], HIGH);                      // Turn on the sensor by setting the RST pin to HIGH
     delay(40);                                                // Delay could be shortened/removed, test please
