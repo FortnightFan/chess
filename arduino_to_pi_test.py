@@ -95,46 +95,51 @@ def ready():
 def deserialize (serialized_data):
     ret_list = ["","","","","","","",""]
     ser_data = serialized_data.split(", ")
-    for i in range (0,8):
-        if len(ser_data[i]) != 8:
-            print("ERROR: Incorrect data sizing")
-            return ret_list
-        else:
+    if len(ser_data) != 8:
+        print("ERROR: Incorrect data sizing")
+        return ret_list
+    else:
+        for i in range (0,8):
             ret_list[i] = ser_data[i]
+        
     return ret_list
 
 def read_port_1():
     global reader_board_mem
+    ser1.flush()
+    time.sleep(1)
     while True:
         try:
-            data = ser1.readline().decode('utf-8').strip()    
+            data = ser1.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data)
                 for i in range (0,8):
-                    reader_board_mem[i][0] = data[i]
-                ser1.flushInput()
+                    reader_board_mem[0][i] = data[i]
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
+            ser1.flush()
             time.sleep(0.25)
 
 def read_port_2():
     global reader_board_mem
+    ser2.flush()
+    time.sleep(1)
     while True:
         try:
-            data = ser2.readline().decode('utf-8').strip()    
+            data = ser2.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data)
                 for i in range (0,8):
-                    reader_board_mem[i][1] = data[i]
-                ser2.flushInput()
+                    reader_board_mem[1][i] = data[i]
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
+            ser2.flush()
             time.sleep(0.25)
             
 def read_port_3():
@@ -171,11 +176,11 @@ White_Pieces = {
     '6'   :  chess.Pawn(0,0,0,chess.board),
     '7'   :  chess.Pawn(0,0,0,chess.board),
     '8'   :  chess.Pawn(0,0,0,chess.board),
-    '9'   :  chess.Queen(0,0,0,chess.board),
+    '5a255081'   :  chess.Queen(0,0,0,chess.board),
     '10'   :  chess.King(0,0,0,chess.board),
-    '11'   :  chess.Horse(0,0,0,chess.board),
+    'd36db3e'   :  chess.Horse(0,0,0,chess.board),
     '12'   :  chess.Horse(0,0,0,chess.board),
-    '13'   :  chess.Bishop(0,0,0,chess.board),
+    '1a3a9c81'   :  chess.Bishop(0,0,0,chess.board),
     '14'   :  chess.Bishop(0,0,0,chess.board),
     '15'   :  chess.Rook(0,0,0,chess.board),
     '16'   :  chess.Rook(0,0,0,chess.board)
@@ -206,21 +211,117 @@ def update_chess_positions(reader_board_mem):
             if reader_board_mem[i][j] == "" or reader_board_mem[i][j] == "00000000":
                 chess.board[i][j] = chess.tile
             elif reader_board_mem[i][j] in White_Pieces:
-                chess.move_piece(chess.board, White_Pieces[reader_board_mem[i][j]], (j,i))
+                chess.board[i][j] = White_Pieces[reader_board_mem[i][j]]
+                White_Pieces[reader_board_mem[i][j]].ypos,White_Pieces[reader_board_mem[i][j]].xpos = i,j
             elif reader_board_mem[i][j] in Black_Pieces:
-                chess.move_piece(chess.board, Black_Pieces[reader_board_mem[i][j]], (j,i))
+                chess.board[i][j] = Black_Pieces[reader_board_mem[i][j]]
+                Black_Pieces[reader_board_mem[i][j]].ypos,Black_Pieces[reader_board_mem[i][j]].xpos = i,j
+
+White_AI = {
+    'switch'        :   False,
+    'difficulty'    :   3
+}
+
+def chess_piece_logic(piece, color):
+    chess.clear_all_lists(chess.board)
+    chess.find_all_poss_moves(chess.board)
+    # chess.legal_king_moves(chess.board, color)
+    # chess.check_pin(chess.board, piece)
+    
+def white_move():
+    BUTTON = False
+    global game_state
+    with threading.Lock():
+        temp_reader_board_mem = copy.deepcopy(reader_board_mem)
+        internal_board_mem = copy.deepcopy(reader_board_mem)
+    exit = False
+    update_chess_positions(internal_board_mem)
+    global piece
+    global piece_ID
+    piece_ID = {
+        'UID' : "-1",
+        'pos' : (-1,-1)
+    }
+    piece = chess.tile
+    while True:
+        exit = False
+        #State 1: Monitor board state, check button state
+        print("White_move_state 1")
+        chess.print_board(chess.board)
+        while (temp_reader_board_mem == internal_board_mem):
+            with threading.Lock():
+                temp_reader_board_mem = reader_board_mem[:]
+                
+            time.sleep(.5)
+            
+            #If button is pressed, return.
+            if BUTTON == True:
+                if White_AI['switch']:
+                    BUTTON = False
+                    game_state = 4
+                    return
+                else:
+                    BUTTON = False
+                    return
+                
+        #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
+        while not exit:
+            if BUTTON == True:
+                if White_AI['switch']:
+                    game_state = 4
+                    return
+                else:
+                    BUTTON = False
+                    return
+            for i in range (0,8):
+                for j in range (0,8):
+                    if temp_reader_board_mem[i][j] != internal_board_mem[i][j]:
+                        try:
+                            piece_ID['UID'] = internal_board_mem[i][j]
+                            piece_ID['pos'] = (i,j)
+                            piece = White_Pieces[piece_ID['UID']]
+                            if piece.color == 0:
+                                exit = True
+                                chess_piece_logic(piece, 0)
+                                chess.print_board(chess.board)
+                                print (piece.poss_moves)
+                                print(piece.poss_captures)
+                                #Turn on lights
+                        except:
+                            print("ERROR: Key index not found")
+
+        print("White_move_state 2")
+        #State 3: Monitor board state, look for the lifted piece. 
+        while not any(piece_ID['UID'] in sublist for sublist in temp_reader_board_mem):
+            temp_reader_board_mem = reader_board_mem[:]
+            time.sleep(0.25)
+            #If button is pressed, return.
+            if BUTTON == True:
+                if White_AI['switch']:
+                    BUTTON = False
+                    game_state = 4
+                    return
+                else:
+                    BUTTON = False
+                    return
+        
+        update_chess_positions(temp_reader_board_mem)
+        chess.print_board(chess.board)
+
+        return
 
 ready()
-while True:
-    print("Reader UIDs")
-    for i in range(0,8):
-        print(reader_board_mem[i])
-    print("\n")
+# while True:
+#     print("Reader UIDs")
+#     for i in range(0,8):
+#         print(reader_board_mem[i])
+#     print("\n")
     
-    print("Chess board")
-    update_chess_positions(reader_board_mem)
-    chess.print_board(chess.board)
-    print("\n")
+#     print("Chess board")
+#     update_chess_positions(reader_board_mem)
+#     chess.print_board(chess.board)
+#     print("\n")
     
-    time.sleep(0.5)
-    
+#     time.sleep(0.5)
+time.sleep(5)
+white_move()
