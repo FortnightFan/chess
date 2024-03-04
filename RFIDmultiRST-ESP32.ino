@@ -48,12 +48,13 @@ void loop() {
   printIDs();
 }
 
-void printIDs() { // Print the ID's
+void printIDs() { 
+  String idString = "";
   for (int i = 0; i < NR_OF_READERS; i++) {
-    Serial.print(currentIDs[i]);
-    Serial.print(", ");
+    idString += String(currentIDs[i]);
+    idString += ", ";
   }
-  Serial.println();
+  Serial.println(idString);
 }
 
 String getCode(byte *buffer, byte bufferSize) {
