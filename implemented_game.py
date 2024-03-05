@@ -166,6 +166,7 @@ Modifies variables:
 """
 reader_board_mem = [["" for _ in range(8)] for _ in range(8)]  #Variable that stores immediate reference data of on-board pieces. Updated constantly.
 internal_board_mem = copy.deepcopy(reader_board_mem) #Variable that references the reader board for logic. Updated only on events
+led_board = [[0 for _ in range(8)] for _ in range(8)]   #Variable that stores the values for the 8x8 led matrices.
 
 def deserialize (serialized_data):
     ret_list = ["","","","","","","",""]
@@ -363,6 +364,15 @@ def chess_piece_logic(piece, color):
     chess.find_all_poss_moves(chess.board)
     chess.legal_king_moves(chess.board, color)
     chess.check_pin(chess.board, piece)
+
+def set_leds(tuples_list):
+    global led_board
+    if tuples_list == None:
+        led_board = [[0 for _ in range(8)] for _ in range(8)]
+    else:
+         for i in range (0,len(tuples_list)):
+             x,y = tuples_list[i]    
+             led_board[y][x] = 1 
 
 """
 Game-state functions

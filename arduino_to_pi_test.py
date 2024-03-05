@@ -11,6 +11,7 @@ Reader communication testing
 
 
 reader_board_mem = [["" for _ in range(8)] for _ in range(8)]  #Variable that stores immediate reference data of on-board pieces. Updated constantly.
+led_board = [[0 for _ in range(8)] for _ in range(8)]   #Variable that stores the values for the 8x8 led matrices.
 
 ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8 = None,None,None,None,None,None,None,None
 reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,reader_thread_6,reader_thread_7,reader_thread_8 = None,None,None,None,None,None,None,None
@@ -38,7 +39,7 @@ def ready():
         print("ERROR: Serial port 2 not found")
 
     try:
-        ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1),
+        ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1)
         reader_thread_3 = threading.Thread(target=read_port_3)
         reader_thread_3.daemon = True
         print("Serial port 3 successfully connected.")
@@ -47,7 +48,7 @@ def ready():
         print("ERROR: Serial port 3 not found")
     
     try:
-        ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1),
+        ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1)
         reader_thread_4 = threading.Thread(target=read_port_4)
         reader_thread_4.daemon = True
         print("Serial port 4 successfully connected.")
@@ -56,7 +57,7 @@ def ready():
         print("ERROR: Serial port 4 not found")
 
     try:
-        ser4 = serial.Serial('/dev/ttyUSB4',9600,timeout=1),
+        ser5 = serial.Serial('/dev/ttyUSB4',9600,timeout=1)
         reader_thread_5 = threading.Thread(target=read_port_5)
         reader_thread_5.daemon = True
         print("Serial port 5 successfully connected.")
@@ -65,7 +66,7 @@ def ready():
         print("ERROR: Serial port 5 not found")
         
     try:
-        ser3 = serial.Serial('/dev/ttyUSB5',9600,timeout=1),
+        ser6 = serial.Serial('/dev/ttyUSB5',9600,timeout=1)
         reader_thread_6 = threading.Thread(target=read_port_6)
         reader_thread_6.daemon = True
         print("Serial port 6 successfully connected.")
@@ -74,7 +75,7 @@ def ready():
         print("ERROR: Serial port 6 not found")
         
     try:
-        ser3 = serial.Serial('/dev/ttyUSB6',9600,timeout=1),
+        ser7 = serial.Serial('/dev/ttyUSB6',9600,timeout=1)
         reader_thread_7 = threading.Thread(target=read_port_7)
         reader_thread_7.daemon = True
         print("Serial port 7 successfully connected.")
@@ -83,7 +84,7 @@ def ready():
         print("ERROR: Serial port 7 not found")
         
     try:
-        ser3 = serial.Serial('/dev/ttyUSB7',9600,timeout=1),
+        ser8 = serial.Serial('/dev/ttyUSB7',9600,timeout=1)
         reader_thread_8 = threading.Thread(target=read_port_8)
         reader_thread_8.daemon = True
         print("Serial port 8 successfully connected.")
@@ -92,11 +93,50 @@ def ready():
         print("ERROR: Serial port 8 not found")
 
 
-def deserialize (serialized_data):
+def deserialize (serialized_data, reader_num):
+    global ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
     ret_list = ["","","","","","","",""]
-    ser_data = serialized_data.split(", ")
+    ser_data = serialized_data.split(" ")
     if len(ser_data) != 8:
         print("ERROR: Incorrect data sizing")
+        # print(f"Resetting serial port {reader_num}")
+        match reader_num:
+            case 1:
+                print(f"Resetting port {reader_num}")
+                ser1.flush()
+                ser1.close()
+                time.sleep(.25)
+                ser1 = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
+                time.sleep(.5)
+            case 2:
+                print(f"Resetting port {reader_num}")
+                ser2.flush()
+                ser2.close()
+                time.sleep(.25)
+                ser2 = serial.Serial('/dev/ttyUSB1',9600,timeout=1)
+                time.sleep(.5)
+            case 3:
+                print(f"Resetting port {reader_num}")
+                ser3.flush()
+                ser3.close()
+                time.sleep(.25)
+                ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1)
+                time.sleep(.5)
+            case 4:
+                print(f"Resetting port {reader_num}")
+                ser4.flush()
+                ser4.close()
+                time.sleep(.25)
+                ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1)
+                time.sleep(.5)
+            case 5:
+                pass
+            case 6:
+                pass
+            case 7:
+                pass
+            case 8:
+                pass
         return ret_list
     else:
         for i in range (0,8):
@@ -106,13 +146,12 @@ def deserialize (serialized_data):
 
 def read_port_1():
     global reader_board_mem
-    ser1.flush()
     time.sleep(1)
     while True:
         try:
             data = ser1.readline().decode('ascii').strip()    
             if data:   
-                data = deserialize(data)
+                data = deserialize(data,1)
                 for i in range (0,8):
                     reader_board_mem[0][i] = data[i]
         except UnicodeDecodeError:
@@ -125,13 +164,12 @@ def read_port_1():
 
 def read_port_2():
     global reader_board_mem
-    ser2.flush()
     time.sleep(1)
     while True:
         try:
             data = ser2.readline().decode('ascii').strip()    
             if data:   
-                data = deserialize(data)
+                data = deserialize(data,2)
                 for i in range (0,8):
                     reader_board_mem[1][i] = data[i]
         except UnicodeDecodeError:
@@ -144,28 +182,109 @@ def read_port_2():
             
 def read_port_3():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser3.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,3)
+                for i in range (0,8):
+                    reader_board_mem[2][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser3.flush()
+            time.sleep(0.25)
+            
 def read_port_4():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser4.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,4)
+                for i in range (0,8):
+                    reader_board_mem[3][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser4.flush()
+            time.sleep(0.25)
+            
 def read_port_5():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser5.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,5)
+                for i in range (0,8):
+                    reader_board_mem[4][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser5.flush()
+            time.sleep(0.25)
 def read_port_6():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser6.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,6)
+                for i in range (0,8):
+                    reader_board_mem[5][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser6.flush()
+            time.sleep(0.25)
 def read_port_7():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser7.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,7)
+                for i in range (0,8):
+                    reader_board_mem[6][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser7.flush()
+            time.sleep(0.25)
+            
 def read_port_8():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser6.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,8)
+                for i in range (0,8):
+                    reader_board_mem[7][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser6.flush()
+            time.sleep(0.25)
 
 White_Pieces = {
     '1'   :  chess.Pawn(0,0,0,chess.board),
@@ -288,6 +407,7 @@ def white_move():
                                 print(piece.poss_captures)
                                 #Turn on lights
                         except:
+                            exit = True
                             print("ERROR: Key index not found")
 
         print("White_move_state 2")
@@ -310,18 +430,47 @@ def white_move():
 
         return
 
+def white_move_AI():
+    global BUTTON
+    global internal_board_mem
+    global game_state
+    with threading.Lock():
+        internal_board_mem = reader_board_mem
+    update_chess_positions(internal_board_mem)
+    chess.white_ai_skill = White_AI['difficulty']
+    move,tup = chess.get_best_move(chess.board, 0)
+    print (tup)
+    #Turn on light
+    while True:
+        #State 1: Monitor board state, check button state
+        while (temp_reader_board_mem == internal_board_mem):
+            with threading.Lock():
+                temp_reader_board_mem = reader_board_mem
+            update_chess_positions(temp_reader_board_mem)
+            time.sleep(0.25)
+            #If button is pressed, return.
+            if BUTTON == True:
+                if White_AI['switch']:
+                    BUTTON = False
+                    game_state = 0
+                    return
+                else:
+                    BUTTON = False
+                    return
+    
 ready()
-# while True:
-#     print("Reader UIDs")
-#     for i in range(0,8):
-#         print(reader_board_mem[i])
-#     print("\n")
-    
-#     print("Chess board")
-#     update_chess_positions(reader_board_mem)
-#     chess.print_board(chess.board)
-#     print("\n")
-    
-#     time.sleep(0.5)
 time.sleep(5)
+while True:
+    print("Reader UIDs")
+    for i in range(0,8):
+        print(reader_board_mem[i])
+    print("\n")
+    
+    # print("Chess board")
+    # update_chess_positions(reader_board_mem)
+    # chess.print_board(chess.board)
+    # print("\n")
+    
+    time.sleep(0.5)
+# time.sleep(5)
 white_move()
