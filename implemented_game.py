@@ -22,41 +22,41 @@ Black_AI = {
 Button_Pressed = False
 
 White_Pieces = {
-    ''   :  chess.Pawn(0,0,0,chess.board),
-    ''   :  chess.Pawn(0,0,0,chess.board),
-    ''   :  chess.Pawn(0,0,0,chess.board),
-    ''   :  chess.Pawn(0,0,0,chess.board),
-    ''   :  chess.Pawn(0,0,0,chess.board),
-    ''   :  chess.Pawn(0,0,0,chess.board),
-    ''   :  chess.Pawn(0,0,0,chess.board),
-    ''   :  chess.Pawn(0,0,0,chess.board),
-    ''   :  chess.Queen(0,0,0,chess.board),
-    ''   :  chess.King(0,0,0,chess.board),
-    ''   :  chess.Horse(0,0,0,chess.board),
-    ''   :  chess.Horse(0,0,0,chess.board),
-    ''   :  chess.Bishop(0,0,0,chess.board),
-    ''   :  chess.Bishop(0,0,0,chess.board),
-    ''   :  chess.Rook(0,0,0,chess.board),
-    ''   :  chess.Rook(0,0,0,chess.board)
+    '1'         :  chess.Pawn(0,0,0,chess.board),
+    '2'         :  chess.Pawn(0,0,0,chess.board),
+    '3'         :  chess.Pawn(0,0,0,chess.board),
+    '4'         :  chess.Pawn(0,0,0,chess.board),
+    '5'         :  chess.Pawn(0,0,0,chess.board),
+    '6'         :  chess.Pawn(0,0,0,chess.board),
+    '7'         :  chess.Pawn(0,0,0,chess.board),
+    '8'         :  chess.Pawn(0,0,0,chess.board),
+    '5a255081'  :  chess.Queen(0,0,0,chess.board),
+    '10'        :  chess.King(0,0,0,chess.board),
+    'd36db3e'   :  chess.Horse(0,0,0,chess.board),
+    '12'        :  chess.Horse(0,0,0,chess.board),
+    '1a3a9c81'  :  chess.Bishop(0,0,0,chess.board),
+    '14'        :  chess.Bishop(0,0,0,chess.board),
+    '15'        :  chess.Rook(0,0,0,chess.board),
+    '16'        :  chess.Rook(0,0,0,chess.board)
 }
 
 Black_Pieces = {
-    ''   :  chess.Pawn(1,0,0,chess.board),
-    ''   :  chess.Pawn(1,0,0,chess.board),
-    ''   :  chess.Pawn(1,0,0,chess.board),
-    ''   :  chess.Pawn(1,0,0,chess.board),
-    ''   :  chess.Pawn(1,0,0,chess.board),
-    ''   :  chess.Pawn(1,0,0,chess.board),
-    ''   :  chess.Pawn(1,0,0,chess.board),
-    ''   :  chess.Pawn(1,0,0,chess.board),
-    ''   :  chess.Queen(1,0,0,chess.board),
-    ''   :  chess.King(1,0,0,chess.board),
-    ''   :  chess.Horse(1,0,0,chess.board),
-    ''   :  chess.Horse(1,0,0,chess.board),
-    ''   :  chess.Bishop(1,0,0,chess.board),
-    ''   :  chess.Bishop(1,0,0,chess.board),
-    ''   :  chess.Rook(1,0,0,chess.board),
-    ''   :  chess.Rook(1,0,0,chess.board)
+    '17'        :  chess.Pawn(1,0,0,chess.board),
+    '18'        :  chess.Pawn(1,0,0,chess.board),
+    '19'        :  chess.Pawn(1,0,0,chess.board),
+    '20'        :  chess.Pawn(1,0,0,chess.board),
+    '21'        :  chess.Pawn(1,0,0,chess.board),
+    '22'        :  chess.Pawn(1,0,0,chess.board),
+    '23'        :  chess.Pawn(1,0,0,chess.board),
+    '24'        :  chess.Pawn(1,0,0,chess.board),
+    '25'        :  chess.Queen(1,0,0,chess.board),
+    '26'        :  chess.King(1,0,0,chess.board),
+    '27'        :  chess.Horse(1,0,0,chess.board),
+    '28'        :  chess.Horse(1,0,0,chess.board),
+    '29'        :  chess.Bishop(1,0,0,chess.board),
+    '30'        :  chess.Bishop(1,0,0,chess.board),
+    '31'        :  chess.Rook(1,0,0,chess.board),
+    '32'        :  chess.Rook(1,0,0,chess.board)
 }
 
 """
@@ -91,7 +91,7 @@ def ready():
         print("ERROR: Serial port 2 not found")
 
     try:
-        ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1),
+        ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1)
         reader_thread_3 = threading.Thread(target=read_port_3)
         reader_thread_3.daemon = True
         print("Serial port 3 successfully connected.")
@@ -100,7 +100,7 @@ def ready():
         print("ERROR: Serial port 3 not found")
     
     try:
-        ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1),
+        ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1)
         reader_thread_4 = threading.Thread(target=read_port_4)
         reader_thread_4.daemon = True
         print("Serial port 4 successfully connected.")
@@ -109,7 +109,7 @@ def ready():
         print("ERROR: Serial port 4 not found")
 
     try:
-        ser4 = serial.Serial('/dev/ttyUSB4',9600,timeout=1),
+        ser5 = serial.Serial('/dev/ttyUSB4',9600,timeout=1)
         reader_thread_5 = threading.Thread(target=read_port_5)
         reader_thread_5.daemon = True
         print("Serial port 5 successfully connected.")
@@ -118,8 +118,8 @@ def ready():
         print("ERROR: Serial port 5 not found")
         
     try:
-        ser3 = serial.Serial('/dev/ttyUSB5',9600,timeout=1),
-        reader_thread_6 = threading.Thread(target=read_port_3)
+        ser6 = serial.Serial('/dev/ttyUSB5',9600,timeout=1)
+        reader_thread_6 = threading.Thread(target=read_port_6)
         reader_thread_6.daemon = True
         print("Serial port 6 successfully connected.")
         reader_thread_6.start()
@@ -127,8 +127,8 @@ def ready():
         print("ERROR: Serial port 6 not found")
         
     try:
-        ser3 = serial.Serial('/dev/ttyUSB6',9600,timeout=1),
-        reader_thread_7 = threading.Thread(target=read_port_3)
+        ser7 = serial.Serial('/dev/ttyUSB6',9600,timeout=1)
+        reader_thread_7 = threading.Thread(target=read_port_7)
         reader_thread_7.daemon = True
         print("Serial port 7 successfully connected.")
         reader_thread_7.start()
@@ -136,8 +136,8 @@ def ready():
         print("ERROR: Serial port 7 not found")
         
     try:
-        ser3 = serial.Serial('/dev/ttyUSB7',9600,timeout=1),
-        reader_thread_8 = threading.Thread(target=read_port_3)
+        ser8 = serial.Serial('/dev/ttyUSB7',9600,timeout=1)
+        reader_thread_8 = threading.Thread(target=read_port_8)
         reader_thread_8.daemon = True
         print("Serial port 8 successfully connected.")
         reader_thread_8.start()
@@ -168,60 +168,219 @@ reader_board_mem = [["" for _ in range(8)] for _ in range(8)]  #Variable that st
 internal_board_mem = copy.deepcopy(reader_board_mem) #Variable that references the reader board for logic. Updated only on events
 led_board = [[0 for _ in range(8)] for _ in range(8)]   #Variable that stores the values for the 8x8 led matrices.
 
-def deserialize (serialized_data):
+def deserialize (serialized_data, reader_num):
+    global ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
     ret_list = ["","","","","","","",""]
     ser_data = serialized_data.split(" ")
-    for i in range (0,len(ser_data)):
-        tup = ser_data[i].split("/")
-        ret_list[int(tup[0])-1] = tup[1]
+    if len(ser_data) != 8:
+        print(f"ERROR port {reader_num}: Incorrect data sizing")
+        match reader_num:
+            case 1:
+                print(f"Resetting port {reader_num}")
+                ser1.flush()
+                ser1.close()
+                time.sleep(.25)
+                ser1 = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
+                time.sleep(.5)
+            case 2:
+                print(f"Resetting port {reader_num}")
+                ser2.flush()
+                ser2.close()
+                time.sleep(.25)
+                ser2 = serial.Serial('/dev/ttyUSB1',9600,timeout=1)
+                time.sleep(.5)
+            case 3:
+                print(f"Resetting port {reader_num}")
+                ser3.flush()
+                ser3.close()
+                time.sleep(.25)
+                ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1)
+                time.sleep(.5)
+            case 4:
+                print(f"Resetting port {reader_num}")
+                ser4.flush()
+                ser4.close()
+                time.sleep(.25)
+                ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1)
+                time.sleep(.5)
+            case 5:
+                print(f"Resetting port {reader_num}")
+                ser5.flush()
+                ser5.close()
+                time.sleep(.25)
+                ser5 = serial.Serial('/dev/ttyUSB4',9600,timeout=1)
+                time.sleep(.5)
+            case 6:
+                print(f"Resetting port {reader_num}")
+                ser6.flush()
+                ser6.close()
+                time.sleep(.25)
+                ser6 = serial.Serial('/dev/ttyUSB5',9600,timeout=1)
+                time.sleep(.5)
+            case 7:
+                print(f"Resetting port {reader_num}")
+                ser7.flush()
+                ser7.close()
+                time.sleep(.25)
+                ser7 = serial.Serial('/dev/ttyUSB6',9600,timeout=1)
+                time.sleep(.5)
+            case 8:
+                print(f"Resetting port {reader_num}")
+                ser8.flush()
+                ser8.close()
+                time.sleep(.25)
+                ser8 = serial.Serial('/dev/ttyUSB7',9600,timeout=1)
+                time.sleep(.5)
+        return ret_list
+    else:
+        for i in range (0,8):
+            ret_list[i] = ser_data[i]
+        
     return ret_list
 
 def read_port_1():
     global reader_board_mem
+    time.sleep(1)
     while True:
         try:
             data = ser1.readline().decode('ascii').strip()    
             if data:   
-                data = deserialize(data)
-                print(data)
+                data = deserialize(data,1)
                 for i in range (0,8):
                     reader_board_mem[0][i] = data[i]
-                ser1.flushInput()
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
+            ser1.flush()
             time.sleep(0.25)
 
 def read_port_2():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser2.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,2)
+                for i in range (0,8):
+                    reader_board_mem[1][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser2.flush()
+            time.sleep(0.25)
+            
 def read_port_3():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser3.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,3)
+                for i in range (0,8):
+                    reader_board_mem[2][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser3.flush()
+            time.sleep(0.25)
+            
 def read_port_4():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser4.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,4)
+                for i in range (0,8):
+                    reader_board_mem[3][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser4.flush()
+            time.sleep(0.25)
+            
 def read_port_5():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser5.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,5)
+                for i in range (0,8):
+                    reader_board_mem[4][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser5.flush()
+            time.sleep(0.25)
+            
 def read_port_6():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser6.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,6)
+                for i in range (0,8):
+                    reader_board_mem[5][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser6.flush()
+            time.sleep(0.25)
+            
 def read_port_7():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser7.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,7)
+                for i in range (0,8):
+                    reader_board_mem[6][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser7.flush()
+            time.sleep(0.25)
+            
 def read_port_8():
     global reader_board_mem
+    time.sleep(1)
     while True:
-        time.sleep(0.25)
+        try:
+            data = ser6.readline().decode('ascii').strip()    
+            if data:   
+                data = deserialize(data,8)
+                for i in range (0,8):
+                    reader_board_mem[7][i] = data[i]
+        except UnicodeDecodeError:
+            print("ERROR: Unicode decode")
+        except Exception as e:
+            print(f"ERROR: {e}")
+        finally:
+            ser8.flush()
+            time.sleep(0.25)
 
 """
 Controls on-board buttons, switches, etc. 
@@ -351,12 +510,14 @@ GAME-LOGIC HELPER FUNCTIONS
 def update_chess_positions(reader_board_mem):
     for i in range (0,8):
         for j in range (0,8):
-            if reader_board_mem[i][j] == "":
+            if reader_board_mem[i][j] == "" or reader_board_mem[i][j] == "00000000":
                 chess.board[i][j] = chess.tile
             elif reader_board_mem[i][j] in White_Pieces:
-                chess.move_piece(chess.board, White_Pieces[reader_board_mem[i][j]], (i,j))
+                chess.board[i][j] = White_Pieces[reader_board_mem[i][j]]
+                White_Pieces[reader_board_mem[i][j]].ypos,White_Pieces[reader_board_mem[i][j]].xpos = i,j
             elif reader_board_mem[i][j] in Black_Pieces:
-                chess.move_piece(chess.board, Black_Pieces[reader_board_mem[i][j]], (i,j))
+                chess.board[i][j] = Black_Pieces[reader_board_mem[i][j]]
+                Black_Pieces[reader_board_mem[i][j]].ypos,Black_Pieces[reader_board_mem[i][j]].xpos = i,j
                 
 #Finds all possible moves on the board specifically for a given piece.
 def chess_piece_logic(piece, color):

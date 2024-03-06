@@ -2,7 +2,6 @@ import chess
 import serial
 import threading
 import time
-# import queue
 import copy
 
 """
@@ -98,8 +97,7 @@ def deserialize (serialized_data, reader_num):
     ret_list = ["","","","","","","",""]
     ser_data = serialized_data.split(" ")
     if len(ser_data) != 8:
-        print("ERROR: Incorrect data sizing")
-        # print(f"Resetting serial port {reader_num}")
+        print(f"ERROR port {reader_num}: Incorrect data sizing")
         match reader_num:
             case 1:
                 print(f"Resetting port {reader_num}")
@@ -130,13 +128,33 @@ def deserialize (serialized_data, reader_num):
                 ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1)
                 time.sleep(.5)
             case 5:
-                pass
+                print(f"Resetting port {reader_num}")
+                ser5.flush()
+                ser5.close()
+                time.sleep(.25)
+                ser5 = serial.Serial('/dev/ttyUSB4',9600,timeout=1)
+                time.sleep(.5)
             case 6:
-                pass
+                print(f"Resetting port {reader_num}")
+                ser6.flush()
+                ser6.close()
+                time.sleep(.25)
+                ser6 = serial.Serial('/dev/ttyUSB5',9600,timeout=1)
+                time.sleep(.5)
             case 7:
-                pass
+                print(f"Resetting port {reader_num}")
+                ser7.flush()
+                ser7.close()
+                time.sleep(.25)
+                ser7 = serial.Serial('/dev/ttyUSB6',9600,timeout=1)
+                time.sleep(.5)
             case 8:
-                pass
+                print(f"Resetting port {reader_num}")
+                ser8.flush()
+                ser8.close()
+                time.sleep(.25)
+                ser8 = serial.Serial('/dev/ttyUSB7',9600,timeout=1)
+                time.sleep(.5)
         return ret_list
     else:
         for i in range (0,8):
@@ -152,8 +170,7 @@ def read_port_1():
             data = ser1.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,1)
-                for i in range (0,8):
-                    reader_board_mem[0][i] = data[i]
+                reader_board_mem[0] = data
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
@@ -170,8 +187,7 @@ def read_port_2():
             data = ser2.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,2)
-                for i in range (0,8):
-                    reader_board_mem[1][i] = data[i]
+                reader_board_mem[1] = data
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
@@ -188,8 +204,7 @@ def read_port_3():
             data = ser3.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,3)
-                for i in range (0,8):
-                    reader_board_mem[2][i] = data[i]
+                reader_board_mem[2] = data
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
@@ -206,8 +221,7 @@ def read_port_4():
             data = ser4.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,4)
-                for i in range (0,8):
-                    reader_board_mem[3][i] = data[i]
+                reader_board_mem[3] = data
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
@@ -224,8 +238,7 @@ def read_port_5():
             data = ser5.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,5)
-                for i in range (0,8):
-                    reader_board_mem[4][i] = data[i]
+                reader_board_mem[4] = data
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
@@ -233,6 +246,7 @@ def read_port_5():
         finally:
             ser5.flush()
             time.sleep(0.25)
+            
 def read_port_6():
     global reader_board_mem
     time.sleep(1)
@@ -241,8 +255,7 @@ def read_port_6():
             data = ser6.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,6)
-                for i in range (0,8):
-                    reader_board_mem[5][i] = data[i]
+                reader_board_mem[5] = data
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
@@ -250,6 +263,7 @@ def read_port_6():
         finally:
             ser6.flush()
             time.sleep(0.25)
+            
 def read_port_7():
     global reader_board_mem
     time.sleep(1)
@@ -258,8 +272,7 @@ def read_port_7():
             data = ser7.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,7)
-                for i in range (0,8):
-                    reader_board_mem[6][i] = data[i]
+                reader_board_mem[6] = data
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
@@ -276,52 +289,51 @@ def read_port_8():
             data = ser6.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,8)
-                for i in range (0,8):
-                    reader_board_mem[7][i] = data[i]
+                reader_board_mem[7] = data
         except UnicodeDecodeError:
             print("ERROR: Unicode decode")
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
-            ser6.flush()
+            ser8.flush()
             time.sleep(0.25)
 
 White_Pieces = {
-    '1'   :  chess.Pawn(0,0,0,chess.board),
-    '2'   :  chess.Pawn(0,0,0,chess.board),
-    '3'   :  chess.Pawn(0,0,0,chess.board),
-    '4'   :  chess.Pawn(0,0,0,chess.board),
-    '5'   :  chess.Pawn(0,0,0,chess.board),
-    '6'   :  chess.Pawn(0,0,0,chess.board),
-    '7'   :  chess.Pawn(0,0,0,chess.board),
-    '8'   :  chess.Pawn(0,0,0,chess.board),
-    '5a255081'   :  chess.Queen(0,0,0,chess.board),
-    '10'   :  chess.King(0,0,0,chess.board),
+    '1'         :  chess.Pawn(0,0,0,chess.board),
+    '2'         :  chess.Pawn(0,0,0,chess.board),
+    '3'         :  chess.Pawn(0,0,0,chess.board),
+    '4'         :  chess.Pawn(0,0,0,chess.board),
+    '5'         :  chess.Pawn(0,0,0,chess.board),
+    '6'         :  chess.Pawn(0,0,0,chess.board),
+    '7'         :  chess.Pawn(0,0,0,chess.board),
+    '8'         :  chess.Pawn(0,0,0,chess.board),
+    '5a255081'  :  chess.Queen(0,0,0,chess.board),
+    '10'        :  chess.King(0,0,0,chess.board),
     'd36db3e'   :  chess.Horse(0,0,0,chess.board),
-    '12'   :  chess.Horse(0,0,0,chess.board),
-    '1a3a9c81'   :  chess.Bishop(0,0,0,chess.board),
-    '14'   :  chess.Bishop(0,0,0,chess.board),
-    '15'   :  chess.Rook(0,0,0,chess.board),
-    '16'   :  chess.Rook(0,0,0,chess.board)
+    '12'        :  chess.Horse(0,0,0,chess.board),
+    '1a3a9c81'  :  chess.Bishop(0,0,0,chess.board),
+    '14'        :  chess.Bishop(0,0,0,chess.board),
+    '15'        :  chess.Rook(0,0,0,chess.board),
+    '16'        :  chess.Rook(0,0,0,chess.board)
 }
 
 Black_Pieces = {
-    '17'   :  chess.Pawn(1,0,0,chess.board),
-    '18'   :  chess.Pawn(1,0,0,chess.board),
-    '19'   :  chess.Pawn(1,0,0,chess.board),
-    '20'   :  chess.Pawn(1,0,0,chess.board),
-    '21'   :  chess.Pawn(1,0,0,chess.board),
-    '22'   :  chess.Pawn(1,0,0,chess.board),
-    '23'   :  chess.Pawn(1,0,0,chess.board),
-    '24'   :  chess.Pawn(1,0,0,chess.board),
-    '25'   :  chess.Queen(1,0,0,chess.board),
-    '26'   :  chess.King(1,0,0,chess.board),
-    '27'   :  chess.Horse(1,0,0,chess.board),
-    '28'   :  chess.Horse(1,0,0,chess.board),
-    '29'   :  chess.Bishop(1,0,0,chess.board),
-    '30'   :  chess.Bishop(1,0,0,chess.board),
-    '31'   :  chess.Rook(1,0,0,chess.board),
-    '32'   :  chess.Rook(1,0,0,chess.board)
+    '17'        :  chess.Pawn(1,0,0,chess.board),
+    '18'        :  chess.Pawn(1,0,0,chess.board),
+    '19'        :  chess.Pawn(1,0,0,chess.board),
+    '20'        :  chess.Pawn(1,0,0,chess.board),
+    '21'        :  chess.Pawn(1,0,0,chess.board),
+    '22'        :  chess.Pawn(1,0,0,chess.board),
+    '23'        :  chess.Pawn(1,0,0,chess.board),
+    '24'        :  chess.Pawn(1,0,0,chess.board),
+    '25'        :  chess.Queen(1,0,0,chess.board),
+    '26'        :  chess.King(1,0,0,chess.board),
+    '27'        :  chess.Horse(1,0,0,chess.board),
+    '28'        :  chess.Horse(1,0,0,chess.board),
+    '29'        :  chess.Bishop(1,0,0,chess.board),
+    '30'        :  chess.Bishop(1,0,0,chess.board),
+    '31'        :  chess.Rook(1,0,0,chess.board),
+    '32'        :  chess.Rook(1,0,0,chess.board)
 }
 
 def update_chess_positions(reader_board_mem):
@@ -341,37 +353,45 @@ White_AI = {
     'difficulty'    :   3
 }
 
+Black_AI = {
+    'switch'        :   False,
+    'difficulty'    :   3
+}
+
 def chess_piece_logic(piece, color):
     chess.clear_all_lists(chess.board)
     chess.find_all_poss_moves(chess.board)
     # chess.legal_king_moves(chess.board, color)
     # chess.check_pin(chess.board, piece)
     
+BUTTON = False
 def white_move():
-    BUTTON = False
+    global BUTTON
     global game_state
+    global piece
+    global piece_ID
+    
     with threading.Lock():
         temp_reader_board_mem = copy.deepcopy(reader_board_mem)
         internal_board_mem = copy.deepcopy(reader_board_mem)
     exit = False
     update_chess_positions(internal_board_mem)
-    global piece
-    global piece_ID
+
     piece_ID = {
         'UID' : "-1",
         'pos' : (-1,-1)
     }
+    
     piece = chess.tile
+    exit = False
     while True:
-        exit = False
         #State 1: Monitor board state, check button state
         print("White_move_state 1")
         chess.print_board(chess.board)
         while (temp_reader_board_mem == internal_board_mem):
             with threading.Lock():
-                temp_reader_board_mem = reader_board_mem[:]
-                
-            time.sleep(.5)
+                temp_reader_board_mem = reader_board_mem[:]  
+            time.sleep(.25)
             
             #If button is pressed, return.
             if BUTTON == True:
@@ -385,13 +405,6 @@ def white_move():
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
         while not exit:
-            if BUTTON == True:
-                if White_AI['switch']:
-                    game_state = 4
-                    return
-                else:
-                    BUTTON = False
-                    return
             for i in range (0,8):
                 for j in range (0,8):
                     if temp_reader_board_mem[i][j] != internal_board_mem[i][j]:
@@ -406,9 +419,17 @@ def white_move():
                                 print (piece.poss_moves)
                                 print(piece.poss_captures)
                                 #Turn on lights
-                        except:
+                        except Exception as e:
                             exit = True
-                            print("ERROR: Key index not found")
+                            print(f"ERROR: {e}")
+                            
+            if BUTTON == True:
+                if White_AI['switch']:
+                    game_state = 4
+                    return
+                else:
+                    BUTTON = False
+                    return
 
         print("White_move_state 2")
         #State 3: Monitor board state, look for the lifted piece. 
