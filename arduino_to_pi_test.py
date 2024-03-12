@@ -105,56 +105,56 @@ def deserialize (serialized_data, reader_num):
                 ser1.close()
                 time.sleep(.25)
                 ser1 = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
-                time.sleep(.5)
+                time.sleep(.25)
             case 2:
                 print(f"Resetting port {reader_num}")
                 ser2.flush()
                 ser2.close()
                 time.sleep(.25)
                 ser2 = serial.Serial('/dev/ttyUSB1',9600,timeout=1)
-                time.sleep(.5)
+                time.sleep(.25)
             case 3:
                 print(f"Resetting port {reader_num}")
                 ser3.flush()
                 ser3.close()
                 time.sleep(.25)
                 ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1)
-                time.sleep(.5)
+                time.sleep(.25)
             case 4:
                 print(f"Resetting port {reader_num}")
                 ser4.flush()
                 ser4.close()
                 time.sleep(.25)
                 ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1)
-                time.sleep(.5)
+                time.sleep(.25)
             case 5:
                 print(f"Resetting port {reader_num}")
                 ser5.flush()
                 ser5.close()
                 time.sleep(.25)
                 ser5 = serial.Serial('/dev/ttyUSB4',9600,timeout=1)
-                time.sleep(.5)
+                time.sleep(.25)
             case 6:
                 print(f"Resetting port {reader_num}")
                 ser6.flush()
                 ser6.close()
                 time.sleep(.25)
                 ser6 = serial.Serial('/dev/ttyUSB5',9600,timeout=1)
-                time.sleep(.5)
+                time.sleep(.25)
             case 7:
                 print(f"Resetting port {reader_num}")
                 ser7.flush()
                 ser7.close()
                 time.sleep(.25)
                 ser7 = serial.Serial('/dev/ttyUSB6',9600,timeout=1)
-                time.sleep(.5)
+                time.sleep(.25)
             case 8:
                 print(f"Resetting port {reader_num}")
                 ser8.flush()
                 ser8.close()
                 time.sleep(.25)
                 ser8 = serial.Serial('/dev/ttyUSB7',9600,timeout=1)
-                time.sleep(.5)
+                time.sleep(.25)
         return ret_list
     else:
         for i in range (0,8):
@@ -286,7 +286,7 @@ def read_port_8():
     time.sleep(1)
     while True:
         try:
-            data = ser6.readline().decode('ascii').strip()    
+            data = ser8.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,8)
                 reader_board_mem[7] = data
@@ -307,13 +307,13 @@ White_Pieces = {
     '6'         :  chess.Pawn(0,0,0,chess.board),
     '7'         :  chess.Pawn(0,0,0,chess.board),
     '8'         :  chess.Pawn(0,0,0,chess.board),
-    '5a255081'  :  chess.Queen(0,0,0,chess.board),
-    '10'        :  chess.King(0,0,0,chess.board),
+    '33bc6e'    :  chess.Queen(0,0,0,chess.board),
+    'b82c5e12'  :  chess.King(0,0,0,chess.board),
     'd36db3e'   :  chess.Horse(0,0,0,chess.board),
-    '12'        :  chess.Horse(0,0,0,chess.board),
+    'a574660'   :  chess.Horse(0,0,0,chess.board),
     '1a3a9c81'  :  chess.Bishop(0,0,0,chess.board),
-    '14'        :  chess.Bishop(0,0,0,chess.board),
-    '15'        :  chess.Rook(0,0,0,chess.board),
+    '11'        :  chess.Bishop(0,0,0,chess.board),
+    'a574660'   :  chess.Rook(0,0,0,chess.board),
     '16'        :  chess.Rook(0,0,0,chess.board)
 }
 
@@ -327,7 +327,7 @@ Black_Pieces = {
     '23'        :  chess.Pawn(1,0,0,chess.board),
     '24'        :  chess.Pawn(1,0,0,chess.board),
     '25'        :  chess.Queen(1,0,0,chess.board),
-    '26'        :  chess.King(1,0,0,chess.board),
+    '6946a318'  :  chess.King(1,0,0,chess.board),
     '27'        :  chess.Horse(1,0,0,chess.board),
     '28'        :  chess.Horse(1,0,0,chess.board),
     '29'        :  chess.Bishop(1,0,0,chess.board),
@@ -421,7 +421,8 @@ def white_move():
                                 #Turn on lights
                         except Exception as e:
                             exit = True
-                            print(f"ERROR: {e}")
+                            print(f"ERROR: {e}\nResetting white move")
+                            return(-1)
                             
             if BUTTON == True:
                 if White_AI['switch']:
@@ -458,40 +459,31 @@ def white_move_AI():
     with threading.Lock():
         internal_board_mem = reader_board_mem
     update_chess_positions(internal_board_mem)
-    chess.white_ai_skill = White_AI['difficulty']
+    chess.print_board(chess.board)
+    chess.white_ai_skill = 1
     move,tup = chess.get_best_move(chess.board, 0)
     print (tup)
     #Turn on light
-    while True:
-        #State 1: Monitor board state, check button state
-        while (temp_reader_board_mem == internal_board_mem):
-            with threading.Lock():
-                temp_reader_board_mem = reader_board_mem
-            update_chess_positions(temp_reader_board_mem)
-            time.sleep(0.25)
-            #If button is pressed, return.
-            if BUTTON == True:
-                if White_AI['switch']:
-                    BUTTON = False
-                    game_state = 0
-                    return
-                else:
-                    BUTTON = False
-                    return
+    # while True:
+    #     #State 1: Monitor board state, check button state
+    #     while (temp_reader_board_mem == internal_board_mem):
+    #         with threading.Lock():
+    #             temp_reader_board_mem = reader_board_mem
+    #         update_chess_positions(temp_reader_board_mem)
+    #         time.sleep(0.25)
+    #         #If button is pressed, return.
     
 ready()
 time.sleep(5)
-while True:
-    print("Reader UIDs")
-    for i in range(0,8):
-        print(reader_board_mem[i])
-    print("\n")
+# white_move_AI()
+# while True:
+#     print("Reader UIDs")
+#     for i in range(0,8):
+#         print(reader_board_mem[i])
+#     print("\n")
     
-    # print("Chess board")
-    # update_chess_positions(reader_board_mem)
-    # chess.print_board(chess.board)
-    # print("\n")
+#     time.sleep(0.5)
     
-    time.sleep(0.5)
-# time.sleep(5)
-white_move()
+while(white_move() == -1):
+    pass
+

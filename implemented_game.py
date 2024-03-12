@@ -455,43 +455,45 @@ game_state = 0
 
 #State machine that constantly runs. game_state var must be updated within functions.
 def game_control():  
+    global game_state
     global internal_board_mem
     global reader_board_mem 
-    chess.fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")  #Testing, delete later
     chess.init(chess.board)
     while True:
         internal_board_mem = reader_board_mem
         match game_state:
             case 0:
-                white_move()
-                chess.clear_all_lists(chess.board)
-                if Black_AI['switch']:
-                    game_state = 5
-                elif chess.is_black_in_check(chess.board):
-                    game_state = 3
-                else:
-                    game_state = 1
+                while(True):
+                    return_id = white_move()
+                    chess.clear_all_lists(chess.board)
+                    if return_id == None:
+                        if Black_AI['switch']:
+                            game_state = 5
+                        else:
+                            game_state = 1
+                        break
+                    if return_id == 1:
+                        game_state = 4
+                        break
+                    
             case 1:
-                black_move()
-                chess.clear_all_lists(chess.board)
-                if White_AI['switch']:
-                    game_state = 4
-                elif chess.is_black_in_check(chess.board):
-                    game_state = 2
-                else:
-                    game_state = 0
-            case 2:
-                white_move_check()
-            case 3:
-                black_move_check()
+                while(True):
+                    return_id = black_move()
+                    chess.clear_all_lists(chess.board)
+                    if return_id == None:
+                        if White_AI['switch']:
+                            game_state = 4
+                        else:
+                            game_state = 0
+                        break
+                    if return_id == 1:
+                        game_state = 5
+                        break
+
             case 4:
                 white_move_AI()
             case 5:
                 black_move_AI()
-            case 6:
-                white_checkmate()
-            case 7:
-                black_checkmate()
             case 8:
                 stalemate()
             
@@ -541,65 +543,158 @@ Game-state functions
 def white_move():
     global BUTTON
     global game_state
-    with threading.Lock():
-        temp_reader_board_mem = reader_board_mem
-        internal_board_mem = reader_board_mem
-    exit = False
-    
     global piece
     global piece_ID
+    
+    with threading.Lock():
+        temp_reader_board_mem = copy.deepcopy(reader_board_mem)
+        internal_board_mem = copy.deepcopy(reader_board_mem)
+    exit = False
+    update_chess_positions(internal_board_mem)
+
     piece_ID = {
-        'UID' : "00000000",
+        'UID' : "-1",
         'pos' : (-1,-1)
     }
+    
     piece = chess.tile
+    exit = False
     while True:
         #State 1: Monitor board state, check button state
+        print("White_move_state 1")
+        chess.print_board(chess.board)
         while (temp_reader_board_mem == internal_board_mem):
             with threading.Lock():
-                temp_reader_board_mem = reader_board_mem
-            update_chess_positions(temp_reader_board_mem)   #Most likely need to move
-            time.sleep(0.25)
+                temp_reader_board_mem = reader_board_mem[:]  
+            time.sleep(.25)
+            
             #If button is pressed, return.
             if BUTTON == True:
                 if White_AI['switch']:
                     BUTTON = False
-                    game_state = 4
-                    return
+                    return (1)
                 else:
                     BUTTON = False
                     return
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
-        exit = False
         while not exit:
-            if BUTTON == True:
-                if White_AI['switch']:
-                    game_state = 4
-                    return
-                else:
-                    BUTTON = False
-                    return
             for i in range (0,8):
                 for j in range (0,8):
                     if temp_reader_board_mem[i][j] != internal_board_mem[i][j]:
                         try:
                             piece_ID['UID'] = internal_board_mem[i][j]
                             piece_ID['pos'] = (i,j)
-                            piece = White_Pieces[internal_board_mem[i][j]]
+                            piece = White_Pieces[piece_ID['UID']]
                             if piece.color == 0:
                                 exit = True
                                 chess_piece_logic(piece, 0)
-                                print(piece.poss_moves)
+                                chess.print_board(chess.board)
+                                print (piece.poss_moves)
+                                print(piece.poss_captures)
                                 #Turn on lights
-                        except:
-                            print("ERROR: Key index not found")
-                                
+                        except Exception as e:
+                            exit = True
+                            print(f"ERROR: {e}\nResetting white move")
+                            return(-1)
+                            
+            if BUTTON == True:
+                if White_AI['switch']:
+                    BUTTON = False
+                    return (1)
+                else:
+                    BUTTON = False
+                    return
+
+        print("White_move_state 2")
         #State 3: Monitor board state, look for the lifted piece. 
-        while (not (piece_ID['UID'] in temp_reader_board_mem)):
+        while not any(piece_ID['UID'] in sublist for sublist in temp_reader_board_mem):
+            temp_reader_board_mem = reader_board_mem[:]
+            time.sleep(0.25)
+            #If button is pressed, return.
+            if BUTTON == True:
+                if White_AI['switch']:
+                    BUTTON = False
+                    return (1)
+                else:
+                    BUTTON = False
+                    return
+        
+        update_chess_positions(temp_reader_board_mem)
+        chess.print_board(chess.board)
+
+        return
+        
+def black_move():
+    global BUTTON
+    global game_state
+    global piece
+    global piece_ID
+    
+    with threading.Lock():
+        temp_reader_board_mem = copy.deepcopy(reader_board_mem)
+        internal_board_mem = copy.deepcopy(reader_board_mem)
+    exit = False
+    update_chess_positions(internal_board_mem)
+
+    piece_ID = {
+        'UID' : "-1",
+        'pos' : (-1,-1)
+    }
+    
+    piece = chess.tile
+    exit = False
+    while True:
+        #State 1: Monitor board state, check button state
+        print("Black_move_state 1")
+        chess.print_board(chess.board)
+        while (temp_reader_board_mem == internal_board_mem):
             with threading.Lock():
-                temp_reader_board_mem = reader_board_mem
-            update_chess_positions(temp_reader_board_mem)
+                temp_reader_board_mem = reader_board_mem[:]  
+            time.sleep(.25)
+            
+            #If button is pressed, return.
+            if BUTTON == True:
+                if Black_AI['switch']:
+                    BUTTON = False
+                    return (1)
+                else:
+                    BUTTON = False
+                    return
+                
+        #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
+        while not exit:
+            for i in range (0,8):
+                for j in range (0,8):
+                    if temp_reader_board_mem[i][j] != internal_board_mem[i][j]:
+                        try:
+                            piece_ID['UID'] = internal_board_mem[i][j]
+                            piece_ID['pos'] = (i,j)
+                            piece = Black_Pieces[piece_ID['UID']]
+                            if piece.color == 1:
+                                exit = True
+                                chess_piece_logic(piece, 1)
+                                chess.print_board(chess.board)
+                                print (piece.poss_moves)
+                                print(piece.poss_captures)
+                                #Turn on lights
+                        except Exception as e:
+                            exit = True
+                            print(f"ERROR: {e}\nResetting black move")
+                            return(-1)
+                            
+            if BUTTON == True:
+                if Black_AI['switch']:
+                    BUTTON = False
+                    return (1)
+                else:
+                    BUTTON = False
+                    return
+
+        print("White_move_state 2")
+        #State 3: Monitor board state, look for the lifted piece. 
+        while not any(piece_ID['UID'] in sublist for sublist in temp_reader_board_mem):
+            temp_reader_board_mem = reader_board_mem[:]
             time.sleep(0.25)
             #If button is pressed, return.
             if BUTTON == True:
@@ -610,16 +705,11 @@ def white_move():
                 else:
                     BUTTON = False
                     return
-        update_chess_positions(temp_reader_board_mem)
         
-def black_move():
-    pass
+        update_chess_positions(temp_reader_board_mem)
+        chess.print_board(chess.board)
 
-def white_move_check():
-    pass
-
-def black_move_check():
-    pass
+        return
 
 def white_move_AI():
     global BUTTON
@@ -628,32 +718,43 @@ def white_move_AI():
     with threading.Lock():
         internal_board_mem = reader_board_mem
     update_chess_positions(internal_board_mem)
+    chess.print_board(chess.board)
     chess.white_ai_skill = White_AI['difficulty']
     move,tup = chess.get_best_move(chess.board, 0)
     print (tup)
     #Turn on light
     while True:
-        #State 1: Monitor board state, check button state
-        while (temp_reader_board_mem == internal_board_mem):
-            with threading.Lock():
-                temp_reader_board_mem = reader_board_mem
-            update_chess_positions(temp_reader_board_mem)
-            time.sleep(0.25)
-            #If button is pressed, return.
-            if BUTTON == True:
-                if White_AI['switch']:
-                    BUTTON = False
-                    game_state = 0
-                    return
-                else:
-                    BUTTON = False
-                    return
-                
+        if BUTTON == True:
+            if not White_AI['switch']:
+                BUTTON = False
+                return (1)
+            else:
+                BUTTON = False #need: adjustable difficulty mid round
+                return
     #Turn off light
     
 def black_move_AI():
-    pass
-    
+    global BUTTON
+    global internal_board_mem
+    global game_state
+    with threading.Lock():
+        internal_board_mem = reader_board_mem
+    update_chess_positions(internal_board_mem)
+    chess.print_board(chess.board)
+    chess.black_ai_skill = White_AI['difficulty']
+    move,tup = chess.get_best_move(chess.board, 0)
+    print (tup)
+    #Turn on light
+    while True:
+        if BUTTON == True:
+            if not Black_AI['switch']:
+                BUTTON = False
+                return (1)
+            else:
+                BUTTON = False #need: adjustable difficulty mid round
+                return
+    #Turn off light
+        
 def white_checkmate():
     pass
 
@@ -665,12 +766,6 @@ def stalemate():
   
 if __name__ == "__main__":
     
-    # chess.fen_to_board("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    # chess.print_board(chess.board)
-    # chess.init(chess.board)
-
-    # reader_board_mem[6][3] = "2109"
-    # white_move()
     # # ready()
     # # game_control()
     # # time.sleep(20)    

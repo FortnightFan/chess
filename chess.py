@@ -1056,7 +1056,7 @@ def board_to_fen(board, color):
             elif isinstance(piece, King):
                 if temp != 0:
                     str_ret += str(temp)
-                    temp = Rook
+                    temp = 0
                 if piece.color == 1:
                     str_ret += 'k'
                 elif piece.color == 0:
@@ -1140,11 +1140,12 @@ def fen_to_board(fen):
         return 1                
 
 def get_best_move(board, color):
-    fen = board_to_fen(board, color)
-    stockfish.set_fen_position(fen)
     if color == 0:
         stockfish.set_skill_level(white_ai_skill)
     elif color == 1:
         stockfish.set_skill_level(black_ai_skill)
+    fen = board_to_fen(board, color)
+    print(fen)
+    stockfish.set_fen_position(fen)
     move = stockfish.get_best_move()
     return move, move_to_tuple(color, move)
