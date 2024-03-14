@@ -426,6 +426,7 @@ def io_control():
                             if type(white_difficulty) == int:
                                 White_AI['difficulty'] = difficulty_levels[white_difficulty]
                                 White_AI['switch'] = True
+                                BUTTON = True
                             else:
                                 White_AI['switch'] = False
                         elif game_state == 1 or game_state == 3 or game_state == 5: #If black's turn
@@ -433,8 +434,11 @@ def io_control():
                             if type(black_difficulty) == int:
                                 Black_AI['difficulty'] = difficulty_levels[black_difficulty]
                                 Black_AI['switch'] = True
+                                BUTTON = True
                     button_pressed_time = None  # Reset timer
-            time.sleep(0.1)
+                    print(White_AI)
+                    print(Black_AI)
+            time.sleep(0.25)
     finally:
         GPIO.cleanup() 
 
@@ -491,9 +495,23 @@ def game_control():
                         break
 
             case 4:
-                white_move_AI()
+                while(True):
+                    return_id = white_move_AI()
+                    if return_id == None:
+                        if Black_AI['switch']:
+                            game_state = 5
+                        else:
+                            game_state = 1
+                        break
             case 5:
-                black_move_AI()
+                while(True):
+                    return_id = black_move_AI()
+                    if return_id == None:
+                        if Black_AI['switch']:
+                            game_state = 5
+                        else:
+                            game_state = 1
+                        break            
             case 8:
                 stalemate()
             
@@ -622,8 +640,6 @@ def white_move():
         
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
-
-        return
         
 def black_move():
     global BUTTON
@@ -708,8 +724,6 @@ def black_move():
         
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
-
-        return
 
 def white_move_AI():
     global BUTTON
