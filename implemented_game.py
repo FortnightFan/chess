@@ -2,7 +2,6 @@ import chess
 import serial
 import threading
 import time
-# import queue
 import copy
 
 EASY = 5
@@ -19,7 +18,8 @@ Black_AI = {
     'difficulty'    :   EASY
 }
 
-Button_Pressed = False
+BUTTON = False
+SWITCH_TURN = False
 
 White_Pieces = {
     '1'         :  chess.Pawn(0,0,0,chess.board),
@@ -31,7 +31,7 @@ White_Pieces = {
     '7'         :  chess.Pawn(0,0,0,chess.board),
     '8'         :  chess.Pawn(0,0,0,chess.board),
     '5a255081'  :  chess.Queen(0,0,0,chess.board),
-    '10'        :  chess.King(0,0,0,chess.board),
+    'b82c5e12'  :  chess.King(0,0,0,chess.board),
     'd36db3e'   :  chess.Horse(0,0,0,chess.board),
     '12'        :  chess.Horse(0,0,0,chess.board),
     '1a3a9c81'  :  chess.Bishop(0,0,0,chess.board),
@@ -145,19 +145,14 @@ def ready():
         print("ERROR: Serial port 8 not found")
         
     #Raspberry pi periferal IO
-    io_thread = threading.Thread(target=io_control)    
-    io_thread.daemon = True
-    io_thread.start()
-
-def exit():    
-    try:
-        ser1.close()
-        ser2.close()
-        ser2.close()
-        print("Serial ports successfully closed.")
-    except:
-        print("ERROR: Port(s) not found") 
-
+    # io_thread = threading.Thread(target=io_control)    
+    # io_thread.daemon = True
+    # io_thread.start()
+    
+    #LED matrix updater.
+    # led_matrix_thread = threading.Thread(target=update_matrix)
+    # led_matrix_thread.daemon = True
+    # led_matrix_thread.start()
 
 """
 Arduino/RFID Reader Functions
@@ -391,9 +386,9 @@ Modifies variables:
 """
    
 import GPIO #dummy import for testing
-BUTTON = False
 #import RPi.GPIO as GPIO
 def io_control():
+    global SWITCH_TURN
     global BUTTON
     global game_state
     GPIO.setmode(GPIO.BCM)
@@ -412,13 +407,8 @@ def io_control():
                 if button_pressed_time is not None:
                     press_duration = time.time() - button_pressed_time
                     if press_duration < 1:
-                        # Short press - toggle game state
-                        if game_state == 0 or game_state == 2 or game_state == 4: #If white's turn
-                            print("Black turn")
-                            BUTTON = True
-                        elif game_state == 1 or game_state == 3 or game_state == 5: #If black's turn
-                            print("White turn")
-                            BUTTON = True
+                        SWITCH_TURN = True
+                        print("Turn switch")
                     else:
                         # Long press - change difficulty
                         if game_state == 0 or game_state == 2 or game_state == 4: #If white's turn
@@ -436,12 +426,59 @@ def io_control():
                                 Black_AI['switch'] = True
                                 BUTTON = True
                     button_pressed_time = None  # Reset timer
-                    print(White_AI)
-                    print(Black_AI)
             time.sleep(0.25)
     finally:
         GPIO.cleanup() 
 
+"""
+Function to update the 8x8 led matrix
+Modifies variables:
+    - led_board
+"""
+def update_matrix():
+    global led_board
+    # Defines the number of rows and columns in your matrix
+    numRows = 8
+    numCols = 8
+
+    # Defines the pins on the Raspberry Pi connected to the rows and columns
+    rowPins = [4, 17, 27, 22, 5, 6, 13, 19]
+    colPins = [26, 21, 20, 16, 12, 25, 24, 23]
+
+    # Set up GPIO
+    GPIO.setmode(GPIO.BCM)
+
+    # Sets row pins as OUTPUT and column pins as INPUT
+    for row_pin in rowPins:
+        GPIO.setup(row_pin, GPIO.OUT)
+
+    for col_pin in colPins:
+        GPIO.setup(col_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+    try:
+        while True:
+            # Loops through each column
+            for col in range(numCols):
+                # Activates the current column
+                GPIO.setup(colPins[col], GPIO.OUT)
+                GPIO.output(colPins[col], GPIO.LOW)
+
+                # Loops through each row in the current column
+                for row in range(numRows):
+                    # Turn on or off the LED at the current row and column based on the display matrix
+                    GPIO.output(rowPins[row], led_board[row][col])
+                    time.sleep(0)  # Adjust this sleep as needed for brightness control (flashes with delay on)
+
+                    # Turns off the LED at the current row and column
+                    GPIO.output(rowPins[row], GPIO.LOW)
+
+                # Deactivate the current column for the next iteration
+                GPIO.setup(colPins[col], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+    except Exception as e:
+        print (f"ERROR: {e}")
+    finally:
+        GPIO.cleanup()
 
 # game_state_dict = {
 #         "White_turn" : 0,
@@ -456,9 +493,14 @@ def io_control():
 #     }
 
 game_state = 0
-
-#State machine that constantly runs. game_state var must be updated within functions.
-def game_control():  
+"""
+Game control state machine that runs the main thread.
+Modifies variables:
+    - game_state
+    - internal_board_mem
+    - reader_board_mem
+"""
+def game_control(): 
     global game_state
     global internal_board_mem
     global reader_board_mem 
@@ -470,15 +512,22 @@ def game_control():
                 while(True):
                     return_id = white_move()
                     chess.clear_all_lists(chess.board)
-                    if return_id == None:
+                    if return_id == -1:
+                        #Error occured, reset.
+                        pass
+                    elif return_id == 0:
+                        if White_AI['switch']:
+                            game_state = 4
+                            break
+                    elif return_id == 1:
                         if Black_AI['switch']:
                             game_state = 5
+                            break
                         else:
                             game_state = 1
-                        break
-                    if return_id == 1:
-                        game_state = 4
-                        break
+                            break
+                    time.sleep(0.5)
+
                     
             case 1:
                 while(True):
@@ -514,14 +563,6 @@ def game_control():
                         break            
             case 8:
                 stalemate()
-            
-            
-            
-            #Game logic to determine next state val
-            
-    # while(1):
-    #     chess.print_board(chess.board)
-    #     time.sleep(1)
 
 """
 GAME-LOGIC HELPER FUNCTIONS
@@ -558,8 +599,16 @@ def set_leds(tuples_list):
 """
 Game-state functions
 """
+"""
+Return values:
+    None: Successful move completed
+    -1: Error occured, reset.
+    0: Change turn to black.
+    1: Turn on white AI.
+"""
 def white_move():
     global BUTTON
+    global SWITCH_TURN
     global game_state
     global piece
     global piece_ID
@@ -587,13 +636,12 @@ def white_move():
             time.sleep(.25)
             
             #If button is pressed, return.
+            if SWITCH_TURN == True:
+                SWITCH_TURN = False
+                return 0
             if BUTTON == True:
-                if White_AI['switch']:
-                    BUTTON = False
-                    return (1)
-                else:
-                    BUTTON = False
-                    return
+                BUTTON = False
+                return -1
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
         while not exit:
@@ -616,13 +664,13 @@ def white_move():
                             print(f"ERROR: {e}\nResetting white move")
                             return(-1)
                             
+            #If button is pressed, return.
+            if SWITCH_TURN == True:
+                SWITCH_TURN = False
+                return 0
             if BUTTON == True:
-                if White_AI['switch']:
-                    BUTTON = False
-                    return (1)
-                else:
-                    BUTTON = False
-                    return
+                BUTTON = False
+                return -1
 
         print("White_move_state 2")
         #State 3: Monitor board state, look for the lifted piece. 
@@ -630,17 +678,23 @@ def white_move():
             temp_reader_board_mem = reader_board_mem[:]
             time.sleep(0.25)
             #If button is pressed, return.
+            if SWITCH_TURN == True:
+                SWITCH_TURN = False
+                return 0
             if BUTTON == True:
-                if White_AI['switch']:
-                    BUTTON = False
-                    return (1)
-                else:
-                    BUTTON = False
-                    return
+                BUTTON = False
+                return -1
         
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
-        
+        return #successful move has been made
+"""
+Return values:
+    None: Successful move completed
+    -1: Error occured, reset.
+    0: Change turn to black.
+    1: Turn on white AI.
+"""
 def black_move():
     global BUTTON
     global game_state
@@ -670,13 +724,12 @@ def black_move():
             time.sleep(.25)
             
             #If button is pressed, return.
+            if SWITCH_TURN == True:
+                SWITCH_TURN = False
+                return 0
             if BUTTON == True:
-                if Black_AI['switch']:
-                    BUTTON = False
-                    return (1)
-                else:
-                    BUTTON = False
-                    return
+                BUTTON = False
+                return -1
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
         while not exit:
@@ -699,13 +752,13 @@ def black_move():
                             print(f"ERROR: {e}\nResetting black move")
                             return(-1)
                             
+            #If button is pressed, return.
+            if SWITCH_TURN == True:
+                SWITCH_TURN = False
+                return 0
             if BUTTON == True:
-                if Black_AI['switch']:
-                    BUTTON = False
-                    return (1)
-                else:
-                    BUTTON = False
-                    return
+                BUTTON = False
+                return -1
 
         print("White_move_state 2")
         #State 3: Monitor board state, look for the lifted piece. 
@@ -713,14 +766,12 @@ def black_move():
             temp_reader_board_mem = reader_board_mem[:]
             time.sleep(0.25)
             #If button is pressed, return.
+            if SWITCH_TURN == True:
+                SWITCH_TURN = False
+                return 0
             if BUTTON == True:
-                if White_AI['switch']:
-                    BUTTON = False
-                    game_state = 4
-                    return
-                else:
-                    BUTTON = False
-                    return
+                BUTTON = False
+                return -1
         
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
@@ -729,23 +780,31 @@ def white_move_AI():
     global BUTTON
     global internal_board_mem
     global game_state
-    with threading.Lock():
-        internal_board_mem = reader_board_mem
-    update_chess_positions(internal_board_mem)
-    chess.print_board(chess.board)
+    
     chess.white_ai_skill = White_AI['difficulty']
-    move,tup = chess.get_best_move(chess.board, 0)
+
+    while(1):
+        with threading.Lock():
+            internal_board_mem = reader_board_mem
+        update_chess_positions(internal_board_mem)
+        chess.print_board(chess.board)
+        move,tup = chess.get_best_move(chess.board, 0)
+        if tup != -1:
+            break
+        time.sleep(0.5)
     print (tup)
-    #Turn on light
+    set_leds(tup)
     while True:
         if BUTTON == True:
             if not White_AI['switch']:
                 BUTTON = False
+                set_leds(None)
                 return (1)
             else:
                 BUTTON = False #need: adjustable difficulty mid round
+                set_leds(None)
                 return
-    #Turn off light
+    
     
 def black_move_AI():
     global BUTTON
@@ -780,10 +839,10 @@ def stalemate():
   
 if __name__ == "__main__":
     
-    # # ready()
-    # # game_control()
-    # # time.sleep(20)    
-    # # exit()
+    ready()
+    time.sleep(5)
+    game_control()
+
     
     pass
 

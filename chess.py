@@ -1145,7 +1145,10 @@ def get_best_move(board, color):
     elif color == 1:
         stockfish.set_skill_level(black_ai_skill)
     fen = board_to_fen(board, color)
-    print(fen)
+    if "K" not in fen or "k" not in fen:
+        return (-1, -1) 
     stockfish.set_fen_position(fen)
     move = stockfish.get_best_move()
     return move, move_to_tuple(color, move)
+
+
