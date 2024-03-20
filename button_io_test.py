@@ -1,4 +1,4 @@
-import GPIO #dummy import for testing
+# import GPIO #dummy import for testing
 import time
 import threading
 
@@ -18,7 +18,7 @@ Black_AI = {
 
 BUTTON = False
 SWITCH_TURN = False
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 def io_control():
     global SWITCH_TURN
     global BUTTON
@@ -35,6 +35,7 @@ def io_control():
             if GPIO.input(button_pin) == GPIO.LOW:  # Button pressed
                 if button_pressed_time is None:
                     button_pressed_time = time.time()
+                    print('button_pressed')
             else:
                 if button_pressed_time is not None:
                     press_duration = time.time() - button_pressed_time
