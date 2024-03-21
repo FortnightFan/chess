@@ -408,22 +408,25 @@ def io_control():
                     press_duration = time.time() - button_pressed_time
                     if press_duration < 1:
                         SWITCH_TURN = True
-                        print("Turn switch")
                     else:
                         # Long press - change difficulty
                         if game_state == 0 or game_state == 2 or game_state == 4: #If white's turn
                             white_difficulty = (white_difficulty + 1) % len(difficulty_levels)
-                            if type(white_difficulty) == int:
+                            if white_difficulty != 0:
                                 White_AI['difficulty'] = difficulty_levels[white_difficulty]
                                 White_AI['switch'] = True
                                 BUTTON = True
                             else:
                                 White_AI['switch'] = False
+                                BUTTON = True
                         elif game_state == 1 or game_state == 3 or game_state == 5: #If black's turn
                             black_difficulty = (black_difficulty + 1) % len(difficulty_levels)
-                            if type(black_difficulty) == int:
+                            if black_difficulty != 0:
                                 Black_AI['difficulty'] = difficulty_levels[black_difficulty]
                                 Black_AI['switch'] = True
+                                BUTTON = True
+                            else:
+                                Black_AI['switch'] = False
                                 BUTTON = True
                     button_pressed_time = None  # Reset timer
             time.sleep(0.25)
@@ -507,6 +510,7 @@ def game_control():
     chess.init(chess.board)
     while True:
         internal_board_mem = reader_board_mem
+        print (f"Game state: {game_state}")
         match game_state:
             case 0:
                 while(True):
@@ -556,10 +560,10 @@ def game_control():
                 while(True):
                     return_id = black_move_AI()
                     if return_id == None:
-                        if Black_AI['switch']:
-                            game_state = 5
+                        if White_AI['switch']:
+                            game_state = 4
                         else:
-                            game_state = 1
+                            game_state = 2
                         break            
             case 8:
                 stalemate()

@@ -1,4 +1,4 @@
-# import GPIO #dummy import for testing
+import GPIO #dummy import for testing
 import time
 import threading
 
@@ -18,7 +18,7 @@ Black_AI = {
 
 BUTTON = False
 SWITCH_TURN = False
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 def io_control():
     global SWITCH_TURN
     global BUTTON
@@ -46,12 +46,14 @@ def io_control():
                         # Long press - change difficulty
                         if game_state == 0 or game_state == 2 or game_state == 4: #If white's turn
                             white_difficulty = (white_difficulty + 1) % len(difficulty_levels)
-                            if type(white_difficulty) == int:
+                            if white_difficulty != 0:
                                 White_AI['difficulty'] = difficulty_levels[white_difficulty]
                                 White_AI['switch'] = True
                                 BUTTON = True
                             else:
                                 White_AI['switch'] = False
+                                BUTTON = True
+
                         elif game_state == 1 or game_state == 3 or game_state == 5: #If black's turn
                             black_difficulty = (black_difficulty + 1) % len(difficulty_levels)
                             if type(black_difficulty) == int:
@@ -64,7 +66,7 @@ def io_control():
         GPIO.cleanup() 
 
 reader_thread = threading.Thread(target=io_control)
-reader_thread.daemon = True
+reader_thread.start()
 while True:
     if BUTTON:
         BUTTON = False
