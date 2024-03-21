@@ -971,7 +971,8 @@ if (system == "Windows"):
     stockfish = Stockfish(path=stockfish_path)
 
 elif (system == "Linux"):
-    stockfish = Stockfish('stockfish')
+    # stockfish = Stockfish('stockfish')
+    stockfish = Stockfish('/usr/games/stockfish')
 else:
     print("ERROR")
     exit()

@@ -510,26 +510,34 @@ def game_control():
     chess.init(chess.board)
     while True:
         internal_board_mem = reader_board_mem
-        print (f"Game state: {game_state}")
         match game_state:
             case 0:
                 while(True):
                     return_id = white_move()
+                    """
+                    Return values:
+                        None: Successful move completed
+                        -1: Error occured, reset.
+                        0: Change turn to black.
+                        1: Turn on white AI.
+                    """
                     chess.clear_all_lists(chess.board)
-                    if return_id == -1:
-                        #Error occured, reset.
-                        pass
-                    elif return_id == 1:
+
+                    if return_id == 1:
                         if White_AI['switch']:
                             game_state = 4
-                            break
-                    elif return_id == 1:
+                            print (f"Game state: 5")
+                            break                        
+                    elif return_id == 0:
                         if Black_AI['switch']:
                             game_state = 5
+                            print (f"Game state: 5")
                             break
                         else:
                             game_state = 1
+                            print (f"Game state: 1")
                             break
+                        
                     time.sleep(0.5)
 
                     
@@ -642,10 +650,11 @@ def white_move():
             #If button is pressed, return.
             if SWITCH_TURN == True:
                 SWITCH_TURN = False
+                print("switch turn false")
                 return 0
             if BUTTON == True:
                 BUTTON = False
-                return -1
+                return 1
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
         while not exit:
@@ -674,7 +683,7 @@ def white_move():
                 return 0
             if BUTTON == True:
                 BUTTON = False
-                return -1
+                return 1
 
         print("White_move_state 2")
         #State 3: Monitor board state, look for the lifted piece. 
@@ -687,7 +696,7 @@ def white_move():
                 return 0
             if BUTTON == True:
                 BUTTON = False
-                return -1
+                return 1
         
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
@@ -764,7 +773,7 @@ def black_move():
                 BUTTON = False
                 return -1
 
-        print("White_move_state 2")
+        print("Black_move_state 2")
         #State 3: Monitor board state, look for the lifted piece. 
         while not any(piece_ID['UID'] in sublist for sublist in temp_reader_board_mem):
             temp_reader_board_mem = reader_board_mem[:]
