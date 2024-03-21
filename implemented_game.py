@@ -145,9 +145,9 @@ def ready():
         print("ERROR: Serial port 8 not found")
         
     #Raspberry pi periferal IO
-    # io_thread = threading.Thread(target=io_control)    
-    # io_thread.daemon = True
-    # io_thread.start()
+    io_thread = threading.Thread(target=io_control)    
+    io_thread.daemon = True
+    io_thread.start()
     
     #LED matrix updater.
     # led_matrix_thread = threading.Thread(target=update_matrix)
@@ -385,8 +385,8 @@ Modifies variables:
     -game_state
 """
    
-import GPIO #dummy import for testing
-#import RPi.GPIO as GPIO
+# import GPIO #dummy import for testing
+import RPi.GPIO as GPIO
 def io_control():
     global SWITCH_TURN
     global BUTTON
