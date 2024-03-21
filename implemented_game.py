@@ -519,7 +519,7 @@ def game_control():
                     if return_id == -1:
                         #Error occured, reset.
                         pass
-                    elif return_id == 0:
+                    elif return_id == 1:
                         if White_AI['switch']:
                             game_state = 4
                             break
