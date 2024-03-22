@@ -722,6 +722,7 @@ Return values:
 """
 def black_move():
     global BUTTON
+    global SWITCH_TURN
     global game_state
     global piece
     global piece_ID
