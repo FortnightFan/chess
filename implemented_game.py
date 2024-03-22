@@ -364,7 +364,7 @@ def read_port_8():
     time.sleep(1)
     while True:
         try:
-            data = ser6.readline().decode('ascii').strip()    
+            data = ser8.readline().decode('ascii').strip()    
             if data:   
                 data = deserialize(data,8)
                 for i in range (0,8):
@@ -407,7 +407,8 @@ def io_control():
                 if button_pressed_time is not None:
                     press_duration = time.time() - button_pressed_time
                     if press_duration < 1:
-                        SWITCH_TURN = True
+                        with threading.Lock():
+                            SWITCH_TURN = True
                     else:
                         # Long press - change difficulty
                         if game_state == 0 or game_state == 2 or game_state == 4: #If white's turn
@@ -558,11 +559,19 @@ def game_control():
             case 4:
                 while(True):
                     return_id = white_move_AI()
+                    """
+                    Return values: 
+                        None: Successful, switch to black's turn.
+                        1: Turn off white AI, switch to white's turn.
+                    """
                     if return_id == None:
                         if Black_AI['switch']:
                             game_state = 5
                         else:
                             game_state = 1
+                        break
+                    elif return_id == 1:
+                        game_state = 0
                         break
             case 5:
                 while(True):
@@ -649,11 +658,12 @@ def white_move():
             
             #If button is pressed, return.
             if SWITCH_TURN == True:
-                SWITCH_TURN = False
-                print("switch turn false")
+                with threading.Lock():
+                    SWITCH_TURN = False
                 return 0
             if BUTTON == True:
-                BUTTON = False
+                with threading.Lock():
+                    BUTTON = False
                 return 1
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
@@ -679,10 +689,12 @@ def white_move():
                             
             #If button is pressed, return.
             if SWITCH_TURN == True:
-                SWITCH_TURN = False
+                with threading.Lock():
+                    SWITCH_TURN = False
                 return 0
             if BUTTON == True:
-                BUTTON = False
+                with threading.Lock():
+                    BUTTON = False
                 return 1
 
         print("White_move_state 2")
@@ -692,10 +704,12 @@ def white_move():
             time.sleep(0.25)
             #If button is pressed, return.
             if SWITCH_TURN == True:
-                SWITCH_TURN = False
+                with threading.Lock():
+                    SWITCH_TURN = False
                 return 0
             if BUTTON == True:
-                BUTTON = False
+                with threading.Lock():
+                    BUTTON = False
                 return 1
         
         update_chess_positions(temp_reader_board_mem)
@@ -738,10 +752,12 @@ def black_move():
             
             #If button is pressed, return.
             if SWITCH_TURN == True:
-                SWITCH_TURN = False
+                with threading.Lock():
+                    SWITCH_TURN = False
                 return 0
             if BUTTON == True:
-                BUTTON = False
+                with threading.Lock():
+                    BUTTON = False
                 return -1
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
@@ -767,10 +783,12 @@ def black_move():
                             
             #If button is pressed, return.
             if SWITCH_TURN == True:
-                SWITCH_TURN = False
+                with threading.Lock():
+                    SWITCH_TURN = False
                 return 0
             if BUTTON == True:
-                BUTTON = False
+                with threading.Lock():
+                    BUTTON = False
                 return -1
 
         print("Black_move_state 2")
@@ -780,10 +798,12 @@ def black_move():
             time.sleep(0.25)
             #If button is pressed, return.
             if SWITCH_TURN == True:
-                SWITCH_TURN = False
+                with threading.Lock():
+                    SWITCH_TURN = False
                 return 0
             if BUTTON == True:
-                BUTTON = False
+                with threading.Lock():
+                    BUTTON = False
                 return -1
         
         update_chess_positions(temp_reader_board_mem)
@@ -791,32 +811,40 @@ def black_move():
 
 def white_move_AI():
     global BUTTON
+    global SWITCH_TURN
     global internal_board_mem
     global game_state
     
-    chess.white_ai_skill = White_AI['difficulty']
-
-    while(1):
+    if White_AI['difficuly'] != 'OFF':
+        chess.white_ai_skill = White_AI['difficulty']
+    
+    while True:
         with threading.Lock():
             internal_board_mem = reader_board_mem
         update_chess_positions(internal_board_mem)
-        chess.print_board(chess.board)
         move,tup = chess.get_best_move(chess.board, 0)
         if tup != -1:
             break
         time.sleep(0.5)
+        
+    chess.print_board(chess.board)
     print (tup)
     set_leds(tup)
+    
+    #Wait for button push to progress.
     while True:
         if BUTTON == True:
-            if not White_AI['switch']:
+            with threading.Lock():
                 BUTTON = False
+            if not White_AI['switch']:
                 set_leds(None)
                 return (1)
-            else:
-                BUTTON = False #need: adjustable difficulty mid round
+        if SWITCH_TURN == True:
+            with threading.Lock():
+                SWITCH_TURN = False
                 set_leds(None)
                 return
+        time.sleep(0.25)
     
     
 def black_move_AI():
