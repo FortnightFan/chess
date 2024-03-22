@@ -528,7 +528,7 @@ def game_control():
                     if return_id == 1:
                         if White_AI['switch']:
                             game_state = 4
-                            print (f"Game state: 5")
+                            print (f"Game state: 4")
                             break                        
                     elif return_id == 0:
                         if Black_AI['switch']:
@@ -540,23 +540,34 @@ def game_control():
                             print (f"Game state: 1")
                             break
                         
-                    time.sleep(0.5)
-
                     
             case 1:
                 while(True):
                     return_id = black_move()
+                    """
+                    Return values:
+                        None: Successful move completed
+                        -1: Error occured, reset.
+                        0: Change turn to white.
+                        1: Turn on white AI.
+                    """
                     chess.clear_all_lists(chess.board)
-                    if return_id == None:
+
+                    if return_id == 1:
+                        if Black_AI['switch']:
+                            game_state = 5
+                            print (f"Game state: 5")
+                            break                        
+                    elif return_id == 0:
                         if White_AI['switch']:
                             game_state = 4
+                            print (f"Game state: 4")
+                            break
                         else:
                             game_state = 0
-                        break
-                    if return_id == 1:
-                        game_state = 5
-                        break
-
+                            print (f"Game state: 0")
+                            break
+                        
             case 4:
                 while(True):
                     return_id = white_move_AI()
@@ -756,7 +767,7 @@ def black_move():
                     return 0
                 if BUTTON == True:
                     BUTTON = False
-                    return -1
+                    return 1
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
         while not exit:
@@ -786,7 +797,7 @@ def black_move():
                     return 0
                 if BUTTON == True:
                     BUTTON = False
-                    return -1
+                    return 1
 
         print("Black_move_state 2")
         #State 3: Monitor board state, look for the lifted piece. 
@@ -800,10 +811,11 @@ def black_move():
                     return 0
                 if BUTTON == True:
                     BUTTON = False
-                    return -1
+                    return 1
         
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
+        return #successful move has been made
 
 def white_move_AI():
     global BUTTON
