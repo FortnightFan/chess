@@ -1,4 +1,5 @@
 from stockfish import Stockfish
+from stockfish import StockfishException
 import os
 import platform
 
@@ -963,7 +964,6 @@ def init(board):    #Corrects the king position variables, pawn variables.
 """
 Stockfish initialization
 """
-
 system = platform.system()
 if (system == "Windows"):
     script_directory = os.path.dirname(os.path.abspath(__name__))
@@ -971,8 +971,8 @@ if (system == "Windows"):
     stockfish = Stockfish(path=stockfish_path)
 
 elif (system == "Linux"):
-    # stockfish = Stockfish('stockfish')
     stockfish = Stockfish('/usr/games/stockfish')
+    
 else:
     print("ERROR")
     exit()
@@ -1140,7 +1140,17 @@ def fen_to_board(fen):
     elif fen[1] == 'b':
         return 1                
 
+"""
+Return values:
+    None: Successful move completed
+    (-1,-1): Invalid position, Stockfish crashed and restarted.
+    move, tup: Successfully found best move.
+        move: chess move notation (e2e4)
+        tup: Tuple of tuples that denote x,y of start and end ((2,2)(2,4))
+"""
+
 def get_best_move(board, color):
+    global stockfish
     if color == 0:
         stockfish.set_skill_level(white_ai_skill)
     elif color == 1:
@@ -1150,8 +1160,8 @@ def get_best_move(board, color):
     try:
         move = stockfish.get_best_move()
         return move, move_to_tuple(color, move)
-    except Exception as e:
-        print(f"ERROR in get_best_move(): {e}")
+    except StockfishException:
+        print("ERROR in get_best_move(): StockfishException")
+        stockfish = Stockfish('/usr/games/stockfish')
+        fish_init()
         return (-1,-1)
-
-

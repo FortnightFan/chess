@@ -588,12 +588,20 @@ def game_control():
             case 5:
                 while(True):
                     return_id = black_move_AI()
+                    """
+                    Return values: 
+                        None: Successful, switch to white's turn.
+                        1: Turn off black AI, switch to black's turn.
+                    """
                     if return_id == None:
                         if White_AI['switch']:
                             game_state = 4
                         else:
                             game_state = 2
                         break            
+                    elif return_id == 1:
+                        game_state = 1
+                        break
             case 8:
                 stalemate()
 
@@ -625,9 +633,9 @@ def set_leds(tuples_list):
     if tuples_list == None:
         led_board = [[0 for _ in range(8)] for _ in range(8)]
     else:
-         for i in range (0,len(tuples_list)):
-             x,y = tuples_list[i]    
-             led_board[y][x] = 1 
+        for i in range (0,len(tuples_list)):
+            x,y = tuples_list[i]    
+            led_board[y][x] = 1 
 lock = threading.Lock()
 """
 Game-state functions
@@ -720,7 +728,7 @@ def white_move():
                 if BUTTON == True:
                     BUTTON = False
                     return 1
-        
+
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
         return #successful move has been made
@@ -823,7 +831,7 @@ def white_move_AI():
     global internal_board_mem
     global game_state
     
-    if White_AI['difficuly'] != 'OFF':
+    if White_AI['difficulty'] != 'OFF':
         chess.white_ai_skill = White_AI['difficulty']
     
     while True:
@@ -833,6 +841,16 @@ def white_move_AI():
         move,tup = chess.get_best_move(chess.board, 0)
         if tup != -1:
             break
+        with lock:
+            if BUTTON == True:
+                BUTTON = False
+                if not White_AI['switch']:
+                    set_leds(None)
+                    return (1)
+            if SWITCH_TURN == True:
+                SWITCH_TURN = False
+                set_leds(None)
+                return
         time.sleep(0.5)
         
     chess.print_board(chess.board)
@@ -856,29 +874,52 @@ def white_move_AI():
     
 def black_move_AI():
     global BUTTON
+    global SWITCH_TURN
     global internal_board_mem
     global game_state
-    with lock:
-        internal_board_mem = reader_board_mem
-    update_chess_positions(internal_board_mem)
+    
+    if Black_AI['difficulty'] != 'OFF':
+        chess.black_ai_skill = Black_AI['difficulty']
+    
+    while True:
+        with lock:
+            internal_board_mem = reader_board_mem
+        update_chess_positions(internal_board_mem)
+        move,tup = chess.get_best_move(chess.board, 0)
+        if tup != -1:
+            break
+        
+        with lock:
+            if BUTTON == True:
+                BUTTON = False
+                if not Black_AI['switch']:
+                    set_leds(None)
+                    return (1)
+            if SWITCH_TURN == True:
+                SWITCH_TURN = False
+                set_leds(None)
+                return        
+        
+        time.sleep(0.5)
+        
     chess.print_board(chess.board)
-    chess.black_ai_skill = White_AI['difficulty']
-    move,tup = chess.get_best_move(chess.board, 0)
     print (tup)
+    set_leds(tup)
+    
     #Wait for button push to progress.
     while True:
         with lock:
             if BUTTON == True:
                 BUTTON = False
-                if not White_AI['switch']:
+                if not Black_AI['switch']:
                     set_leds(None)
                     return (1)
             if SWITCH_TURN == True:
                 SWITCH_TURN = False
                 set_leds(None)
                 return
-        time.sleep(0.25)
-        
+        time.sleep(0.25)   
+
 def white_checkmate():
     pass
 
@@ -887,7 +928,7 @@ def black_checkmate():
 
 def stalemate():
     pass
-  
+
 if __name__ == "__main__":
     
     ready()
