@@ -1148,7 +1148,6 @@ Return values:
         move: chess move notation (e2e4)
         tup: Tuple of tuples that denote x,y of start and end ((2,2)(2,4))
 """
-
 def get_best_move(board, color):
     global stockfish
     if color == 0:

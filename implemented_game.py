@@ -50,7 +50,7 @@ Black_Pieces = {
     '23'        :  chess.Pawn(1,0,0,chess.board),
     '24'        :  chess.Pawn(1,0,0,chess.board),
     '25'        :  chess.Queen(1,0,0,chess.board),
-    '26'        :  chess.King(1,0,0,chess.board),
+    '6946a318'  :  chess.King(1,0,0,chess.board),
     '27'        :  chess.Horse(1,0,0,chess.board),
     '28'        :  chess.Horse(1,0,0,chess.board),
     '29'        :  chess.Bishop(1,0,0,chess.board),
@@ -145,9 +145,9 @@ def ready():
         print("ERROR: Serial port 8 not found")
         
     #Raspberry pi periferal IO
-    io_thread = threading.Thread(target=io_control)    
-    io_thread.daemon = True
-    io_thread.start()
+    # io_thread = threading.Thread(target=io_control)    
+    # io_thread.daemon = True
+    # io_thread.start()
     
     #LED matrix updater.
     # led_matrix_thread = threading.Thread(target=update_matrix)
@@ -235,6 +235,7 @@ def deserialize (serialized_data, reader_num):
 
 def read_port_1():
     global reader_board_mem
+    global ser1
     time.sleep(1)
     while True:
         try:
@@ -248,11 +249,11 @@ def read_port_1():
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
-            ser1.flush()
             time.sleep(0.25)
 
 def read_port_2():
     global reader_board_mem
+    global ser2
     time.sleep(1)
     while True:
         try:
@@ -266,11 +267,11 @@ def read_port_2():
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
-            ser2.flush()
             time.sleep(0.25)
             
 def read_port_3():
     global reader_board_mem
+    global ser3
     time.sleep(1)
     while True:
         try:
@@ -284,11 +285,11 @@ def read_port_3():
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
-            ser3.flush()
             time.sleep(0.25)
             
 def read_port_4():
     global reader_board_mem
+    global ser4
     time.sleep(1)
     while True:
         try:
@@ -302,11 +303,11 @@ def read_port_4():
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
-            ser4.flush()
             time.sleep(0.25)
             
 def read_port_5():
     global reader_board_mem
+    global ser5
     time.sleep(1)
     while True:
         try:
@@ -320,11 +321,11 @@ def read_port_5():
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
-            ser5.flush()
             time.sleep(0.25)
             
 def read_port_6():
     global reader_board_mem
+    global ser6
     time.sleep(1)
     while True:
         try:
@@ -338,7 +339,6 @@ def read_port_6():
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
-            ser6.flush()
             time.sleep(0.25)
             
 def read_port_7():
@@ -356,7 +356,6 @@ def read_port_7():
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
-            ser7.flush()
             time.sleep(0.25)
             
 def read_port_8():
@@ -374,7 +373,6 @@ def read_port_8():
         except Exception as e:
             print(f"ERROR: {e}")
         finally:
-            ser8.flush()
             time.sleep(0.25)
 
 """
@@ -385,8 +383,8 @@ Modifies variables:
     -game_state
 """
    
-# import GPIO #dummy import for testing
-import RPi.GPIO as GPIO
+import GPIO #dummy import for testing
+# import RPi.GPIO as GPIO
 def io_control():
     global SWITCH_TURN
     global BUTTON
