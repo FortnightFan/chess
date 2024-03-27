@@ -47,3 +47,7 @@ def update_matrix(led_board):
     finally:
         GPIO.cleanup()
 
+led_board = [[0 for _ in range(8)] for _ in range(8)]   #Variable that stores the values for the 8x8 led matrices.
+
+while True:
+    update_matrix(led_board)

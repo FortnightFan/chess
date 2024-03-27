@@ -3,6 +3,8 @@ import serial
 import threading
 import time
 import copy
+# import GPIO #dummy import for testing
+import RPi.GPIO as GPIO
 
 EASY = 5
 NORMAL = 10
@@ -67,6 +69,53 @@ Modifies variables
 """
 ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8 = None,None,None,None,None,None,None,None
 reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,reader_thread_6,reader_thread_7,reader_thread_8 = None,None,None,None,None,None,None,None
+
+import atexit
+def cleanup():
+    global ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
+    try:
+        ser1.flush()
+        ser1.close()
+    except Exception as e:
+        print(f"ERROR: {e}")
+    try:
+        
+        ser2.flush()
+        ser2.close()
+    except Exception as e:
+        print(f"ERROR: {e}")
+    try:
+        ser3.flush()
+        ser3.close()
+    except Exception as e:
+        print(f"ERROR: {e}")
+    try:
+        ser4.flush()
+        ser4.close()
+    except Exception as e:
+        print(f"ERROR: {e}")
+    try:
+        ser5.flush()
+        ser5.close()
+    except Exception as e:
+        print(f"ERROR: {e}")
+    try:
+        ser6.flush()
+        ser6.close()
+    except Exception as e:
+        print(f"ERROR: {e}")
+    try:
+        ser7.flush()
+        ser7.close()
+    except Exception as e:
+        print(f"ERROR: {e}")
+    try:
+        ser8.flush()
+        ser8.close()
+    except Exception as e:
+        print(f"ERROR: {e}")
+
+atexit.register(cleanup)
 
 def ready():
     global ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
@@ -145,9 +194,9 @@ def ready():
         print("ERROR: Serial port 8 not found")
         
     #Raspberry pi periferal IO
-    io_thread = threading.Thread(target=io_control)    
-    io_thread.daemon = True
-    io_thread.start()
+    # io_thread = threading.Thread(target=io_control)    
+    # io_thread.daemon = True
+    # io_thread.start()
     
     #LED matrix updater.
     # led_matrix_thread = threading.Thread(target=update_matrix)
@@ -383,8 +432,6 @@ Modifies variables:
     -game_state
 """
    
-# import GPIO #dummy import for testing
-import RPi.GPIO as GPIO
 def io_control():
     global SWITCH_TURN
     global BUTTON
@@ -883,7 +930,7 @@ def black_move_AI():
         with lock:
             internal_board_mem = reader_board_mem
         update_chess_positions(internal_board_mem)
-        move,tup = chess.get_best_move(chess.board, 0)
+        move,tup = chess.get_best_move(chess.board, 1)
         if tup != -1:
             break
         
