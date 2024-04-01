@@ -23,6 +23,8 @@ Black_AI = {
 BUTTON = False
 SWITCH_TURN = False
 
+game_state = 0
+
 White_Pieces = {
     '1'         :  chess.Pawn(0,0,0,chess.board),
     '2'         :  chess.Pawn(0,0,0,chess.board),
@@ -193,15 +195,15 @@ def ready():
     except:
         print("ERROR: Serial port 8 not found")
         
-    #Raspberry pi periferal IO
-    # io_thread = threading.Thread(target=io_control)    
-    # io_thread.daemon = True
-    # io_thread.start()
+    # Raspberry pi periferal IO
+    io_thread = threading.Thread(target=io_control)    
+    io_thread.daemon = True
+    io_thread.start()
     
-    #LED matrix updater.
-    # led_matrix_thread = threading.Thread(target=update_matrix)
-    # led_matrix_thread.daemon = True
-    # led_matrix_thread.start()
+    # LED matrix updater.
+    led_matrix_thread = threading.Thread(target=update_matrix)
+    led_matrix_thread.daemon = True
+    led_matrix_thread.start()
 
 """
 Arduino/RFID Reader Functions
@@ -431,7 +433,7 @@ Modifies variables:
     -Black_AI
     -game_state
 """
-   
+
 def io_control():
     global SWITCH_TURN
     global BUTTON
@@ -542,7 +544,7 @@ def update_matrix():
 #         "Stalemate" : 8
 #     }
 
-game_state = 0
+
 """
 Game control state machine that runs the main thread.
 Modifies variables:
@@ -670,8 +672,8 @@ def update_chess_positions(reader_board_mem):
 def chess_piece_logic(piece, color):
     chess.clear_all_lists(chess.board)
     chess.find_all_poss_moves(chess.board)
-    chess.legal_king_moves(chess.board, color)
-    chess.check_pin(chess.board, piece)
+    # chess.legal_king_moves(chess.board, color)
+    # chess.check_pin(chess.board, piece)
 
 def set_leds(tuples_list):
     global led_board
@@ -745,7 +747,8 @@ def white_move():
                                 chess.print_board(chess.board)
                                 print (piece.poss_moves)
                                 print(piece.poss_captures)
-                                #Turn on lights
+                                set_leds(piece.poss_moves)
+                                set_leds(piece.poss_captures)
                         except Exception as e:
                             exit = True
                             print(f"ERROR: {e}\nResetting white move")
@@ -755,9 +758,11 @@ def white_move():
             with lock:
                 if SWITCH_TURN == True:
                     SWITCH_TURN = False
+                    set_leds(None)
                     return 0
                 if BUTTON == True:
                     BUTTON = False
+                    set_leds(None)
                     return 1
 
         print("White_move_state 2")
@@ -769,9 +774,11 @@ def white_move():
             with lock:
                 if SWITCH_TURN == True:
                     SWITCH_TURN = False
+                    set_leds(None)
                     return 0
                 if BUTTON == True:
                     BUTTON = False
+                    set_leds(None)
                     return 1
 
         update_chess_positions(temp_reader_board_mem)
@@ -837,19 +844,23 @@ def black_move():
                                 chess.print_board(chess.board)
                                 print (piece.poss_moves)
                                 print(piece.poss_captures)
-                                #Turn on lights
+                                set_leds(piece.poss_moves)
+                                set_leds(piece.poss_captures)
                         except Exception as e:
                             exit = True
                             print(f"ERROR: {e}\nResetting black move")
+                            set_leds(None)
                             return(-1)
                             
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
                     SWITCH_TURN = False
+                    set_leds(None)
                     return 0
                 if BUTTON == True:
                     BUTTON = False
+                    set_leds(None)
                     return 1
 
         print("Black_move_state 2")
@@ -861,11 +872,13 @@ def black_move():
             with lock:
                 if SWITCH_TURN == True:
                     SWITCH_TURN = False
+                    set_leds(None)
                     return 0
                 if BUTTON == True:
                     BUTTON = False
+                    set_leds(None)
                     return 1
-        
+        set_leds(None)
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
         return #successful move has been made
@@ -889,14 +902,14 @@ def white_move_AI():
         with lock:
             if BUTTON == True:
                 BUTTON = False
+                set_leds(None)
                 if not White_AI['switch']:
-                    set_leds(None)
                     return (1)
             if SWITCH_TURN == True:
                 SWITCH_TURN = False
                 set_leds(None)
                 return
-        time.sleep(0.5)
+        time.sleep(0.25)
         
     chess.print_board(chess.board)
     print (tup)
@@ -907,8 +920,8 @@ def white_move_AI():
         with lock:
             if BUTTON == True:
                 BUTTON = False
+                set_leds(None)
                 if not White_AI['switch']:
-                    set_leds(None)
                     return (1)
             if SWITCH_TURN == True:
                 SWITCH_TURN = False

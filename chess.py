@@ -1163,4 +1163,8 @@ def get_best_move(board, color):
         print("ERROR in get_best_move(): StockfishException")
         stockfish = Stockfish('/usr/games/stockfish')
         fish_init()
+        if color == 0:
+            stockfish.set_skill_level(white_ai_skill)
+        elif color == 1:
+            stockfish.set_skill_level(black_ai_skill)
         return (-1,-1)
