@@ -4,7 +4,7 @@ import threading
 import time
 import copy
 # import GPIO #dummy import for testing
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 
 EASY = 5
 NORMAL = 10
@@ -119,7 +119,7 @@ def cleanup():
     except Exception as e:
         print(f"ERROR: {e}")
 
-atexit.register(cleanup)
+# atexit.register(cleanup)
 
 def ready():
     global ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
@@ -202,7 +202,7 @@ def ready():
     io_thread.daemon = True
     io_thread.start()
     
-    # LED matrix updater.
+    # # LED matrix updater.
     led_matrix_thread = threading.Thread(target=update_matrix)
     led_matrix_thread.daemon = True
     led_matrix_thread.start()
@@ -684,7 +684,7 @@ def set_leds(tuples_list):
     else:
         for i in range (0,len(tuples_list)):
             x,y = tuples_list[i]    
-            led_board[y][x] = 1 
+            led_board[7-y][7-x] = 1 
 lock = threading.Lock()
 """
 Game-state functions
@@ -789,6 +789,7 @@ def white_move():
 
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
+        
         return #successful move has been made
 """
 Return values:
@@ -1001,10 +1002,11 @@ if __name__ == "__main__":
     ready()
     time.sleep(3)
     for i in range (0,8):
-        led_board[i] = [1,1,1,1,1,1,1,1]
-        time.sleep(1)
-        led_board[i] = [0,0,0,0,0,0,0,0]
-        time.sleep(1)
+        for j in range(0,8):
+            led_board[i][j] = 1
+            time.sleep(0.5)
+            led_board[i][j] = 0
+            time.sleep(0.5)
     game_control()
 
 
