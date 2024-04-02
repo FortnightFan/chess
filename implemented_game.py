@@ -75,6 +75,8 @@ reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,
 import atexit
 def cleanup():
     global ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
+    global reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,reader_thread_6,reader_thread_7,reader_thread_8
+
     try:
         ser1.flush()
         ser1.close()
