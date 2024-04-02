@@ -1,9 +1,11 @@
 # import RPi.GPIO as GPIO
 import GPIO
 import time
+import threading
+led_board = [[0 for _ in range(8)] for _ in range(8)]   #Variable that stores the values for the 8x8 led matrices.
 
-def update_matrix(led_board):
-
+def update_matrix():
+    global led_board
     # Defines the number of rows and columns in your matrix
     numRows = 8
     numCols = 8
@@ -49,5 +51,13 @@ def update_matrix(led_board):
 
 led_board = [[0 for _ in range(8)] for _ in range(8)]   #Variable that stores the values for the 8x8 led matrices.
 
+
+thread = threading.Thread(target=update_matrix)
+thread.start()
+
 while True:
-    update_matrix(led_board)
+    for i in range(0,8):
+        led_board[i] = [1,1,1,1,1,1,1,1]
+        time.sleep(1)
+        led_board[i] = [0,0,0,0,0,0,0,0]
+        time.sleep(1)
