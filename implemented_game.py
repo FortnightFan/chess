@@ -4,7 +4,7 @@ import threading
 import time
 import copy
 # import GPIO #dummy import for testing
-# import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 
 EASY = 5
 NORMAL = 10
@@ -787,6 +787,7 @@ def white_move():
                     set_leds(None)
                     return 1
 
+        set_leds(None)
         update_chess_positions(temp_reader_board_mem)
         chess.print_board(chess.board)
         
@@ -1004,9 +1005,9 @@ if __name__ == "__main__":
     for i in range (0,8):
         for j in range(0,8):
             led_board[i][j] = 1
-            time.sleep(0.5)
+            time.sleep(0.1)
             led_board[i][j] = 0
-            time.sleep(0.5)
+            time.sleep(0.1)
     game_control()
 
 
