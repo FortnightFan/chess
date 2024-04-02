@@ -745,10 +745,14 @@ def white_move():
                                 exit = True
                                 chess_piece_logic(piece, 0)
                                 chess.print_board(chess.board)
-                                print (piece.poss_moves)
-                                print(piece.poss_captures)
-                                set_leds(piece.poss_moves)
-                                set_leds(piece.poss_captures)
+                                if (piece.poss_moves == [] and piece.poss_captures == []):
+                                    print(f"No possible moves for {piece}")
+                                    set_leds(None)
+                                else:
+                                    print (piece.poss_moves)
+                                    print(piece.poss_captures)
+                                    set_leds(piece.poss_moves)
+                                    set_leds(piece.poss_captures)
                         except Exception as e:
                             exit = True
                             print(f"ERROR: {e}\nResetting white move")
@@ -842,10 +846,14 @@ def black_move():
                                 exit = True
                                 chess_piece_logic(piece, 1)
                                 chess.print_board(chess.board)
-                                print (piece.poss_moves)
-                                print(piece.poss_captures)
-                                set_leds(piece.poss_moves)
-                                set_leds(piece.poss_captures)
+                                if (piece.poss_moves == [] and piece.poss_captures == []):
+                                    print(f"No possible moves for {piece}")
+                                    set_leds(None)
+                                else:
+                                    print (piece.poss_moves)
+                                    print(piece.poss_captures)
+                                    set_leds(piece.poss_moves)
+                                    set_leds(piece.poss_captures)
                         except Exception as e:
                             exit = True
                             print(f"ERROR: {e}\nResetting black move")
@@ -988,11 +996,15 @@ def stalemate():
     pass
 
 if __name__ == "__main__":
-    
     ready()
-    time.sleep(5)
+    time.sleep(3)
+    for i in range (0,8):
+        led_board[i] = [1,1,1,1,1,1,1,1]
+        time.sleep(1)
+        led_board[i] = [0,0,0,0,0,0,0,0]
+        time.sleep(1)
     game_control()
 
-    
+
     pass
 
