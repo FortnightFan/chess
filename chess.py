@@ -927,7 +927,11 @@ def can_black_block(board): #called when black is in check. Corrects piece moves
     
 def is_white_checkmate(board):
     if is_white_in_check(board) == True:
-        king = board[white_king_pos[1]][white_king_pos[0]]
+        try:
+            king = board[white_king_pos[1]][white_king_pos[0]]
+        except:
+            print("Calculating if checkmate. No white king present, abort.")
+            return False
         king.find_poss_moves()
         legal_king_moves(board, king)
         if king.poss_moves == [] and king.poss_captures == [] and (not can_white_block(board)):
@@ -936,7 +940,11 @@ def is_white_checkmate(board):
 
 def is_black_checkmate(board):
     if is_black_in_check(board) == True:
-        king = board[black_king_pos[1]][black_king_pos[0]]
+        try:
+            king = board[black_king_pos[1]][black_king_pos[0]]
+        except:
+            print("Calculating if checkmate. No black king present, abort.")
+            return False
         king.find_poss_moves()
         legal_king_moves(board, king)
         if king.poss_moves == [] and king.poss_captures == [] and not(can_black_block(board)):
@@ -960,7 +968,27 @@ def init(board):    #Corrects the king position variables, pawn variables.
                     white_king_pos = (piece.xpos,piece.ypos)
                 elif piece.color == 1:
                     black_king_pos = (piece.xpos,piece.ypos)
-                    
+
+def update_king_pos(board):    #Corrects the king position variables, pawn variables.
+    global white_king_pos, black_king_pos
+    white_king_present = False
+    black_king_present = False
+    for row in range(0,SIZE_V):
+        for col in range(0,SIZE_H):
+            piece = board[row][col]
+            if isinstance(piece, King):
+                if piece.color == 0:
+                    white_king_pos = (piece.xpos,piece.ypos)
+                    white_king_present = True
+                elif piece.color == 1:
+                    black_king_pos = (piece.xpos,piece.ypos)
+                    black_king_present = True
+    #If king is not present on board
+    if white_king_present == False:
+        white_king_pos = (-1,-1)
+    if black_king_present == False:
+        black_king_pos = (-1,-1)
+
 """
 Stockfish initialization
 """

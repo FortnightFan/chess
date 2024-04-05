@@ -72,55 +72,6 @@ Modifies variables
 ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8 = None,None,None,None,None,None,None,None
 reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,reader_thread_6,reader_thread_7,reader_thread_8 = None,None,None,None,None,None,None,None
 
-import atexit
-def cleanup():
-    global ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
-    global reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,reader_thread_6,reader_thread_7,reader_thread_8
-
-    try:
-        ser1.flush()
-        ser1.close()
-    except Exception as e:
-        print(f"ERROR: {e}")
-    try:
-        
-        ser2.flush()
-        ser2.close()
-    except Exception as e:
-        print(f"ERROR: {e}")
-    try:
-        ser3.flush()
-        ser3.close()
-    except Exception as e:
-        print(f"ERROR: {e}")
-    try:
-        ser4.flush()
-        ser4.close()
-    except Exception as e:
-        print(f"ERROR: {e}")
-    try:
-        ser5.flush()
-        ser5.close()
-    except Exception as e:
-        print(f"ERROR: {e}")
-    try:
-        ser6.flush()
-        ser6.close()
-    except Exception as e:
-        print(f"ERROR: {e}")
-    try:
-        ser7.flush()
-        ser7.close()
-    except Exception as e:
-        print(f"ERROR: {e}")
-    try:
-        ser8.flush()
-        ser8.close()
-    except Exception as e:
-        print(f"ERROR: {e}")
-
-# atexit.register(cleanup)
-
 def ready():
     global ser1,ser2,ser3,ser4,ser5,ser6,ser7,ser8
     global reader_thread_1,reader_thread_2,reader_thread_3,reader_thread_4,reader_thread_5,reader_thread_6,reader_thread_7,reader_thread_8
@@ -564,6 +515,10 @@ def game_control():
         match game_state:
             case 0:
                 while(True):
+                    if chess.is_white_checkmate():
+                        return
+                    chess.clear_all_lists(chess.board)
+                    chess.update_king_pos(chess.board)
                     return_id = white_move()
                     """
                     Return values:
@@ -573,7 +528,7 @@ def game_control():
                         1: Turn on white AI.
                     """
                     chess.clear_all_lists(chess.board)
-
+                    chess.check_promotions(chess.board,0)
                     if return_id == 1:
                         if White_AI['switch']:
                             game_state = 4
@@ -592,6 +547,10 @@ def game_control():
                     
             case 1:
                 while(True):
+                    if chess.is_black_checkmate():
+                        return
+                    chess.clear_all_lists(chess.board)
+                    chess.update_king_pos(chess.board)
                     return_id = black_move()
                     """
                     Return values:
@@ -601,7 +560,7 @@ def game_control():
                         1: Turn on white AI.
                     """
                     chess.clear_all_lists(chess.board)
-
+                    chess.check_promotions(chess.board,1)
                     if return_id == 1:
                         if Black_AI['switch']:
                             game_state = 5
