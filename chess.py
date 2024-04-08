@@ -1198,5 +1198,3 @@ def get_best_move(board, color):
         elif color == 1:
             stockfish.set_skill_level(black_ai_skill)
         return (-1,-1)
-
-print(get_best_move(board, 0))

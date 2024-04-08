@@ -400,42 +400,40 @@ def io_control():
     difficulty_levels = ["OFF", EASY, NORMAL, HARD]
     black_difficulty = 0    #Index
     white_difficulty = 0    #index
-    try:
-        while True:
-            if GPIO.input(button_pin) == GPIO.LOW:  # Button pressed
-                if button_pressed_time is None:
-                    button_pressed_time = time.time()
-            else:
-                if button_pressed_time is not None:
-                    press_duration = time.time() - button_pressed_time
-                    if press_duration < 1:
-                        with lock:
-                            SWITCH_TURN = True
-                    else:
-                        # Long press - change difficulty
-                        if game_state == 0 or game_state == 2 or game_state == 4: #If white's turn
-                            white_difficulty = (white_difficulty + 1) % len(difficulty_levels)
-                            if white_difficulty != 0:
-                                White_AI['difficulty'] = difficulty_levels[white_difficulty]
-                                White_AI['switch'] = True
-                                with lock:
-                                    BUTTON = True
-                            else:
-                                White_AI['switch'] = False
+    while True:
+        if GPIO.input(button_pin) == GPIO.LOW:  # Button pressed
+            if button_pressed_time is None:
+                button_pressed_time = time.time()
+        else:
+            if button_pressed_time is not None:
+                press_duration = time.time() - button_pressed_time
+                if press_duration < 1:
+                    with lock:
+                        SWITCH_TURN = True
+                else:
+                    # Long press - change difficulty
+                    if game_state == 0 or game_state == 2 or game_state == 4: #If white's turn
+                        white_difficulty = (white_difficulty + 1) % len(difficulty_levels)
+                        if white_difficulty != 0:
+                            White_AI['difficulty'] = difficulty_levels[white_difficulty]
+                            White_AI['switch'] = True
+                            with lock:
                                 BUTTON = True
-                        elif game_state == 1 or game_state == 3 or game_state == 5: #If black's turn
-                            black_difficulty = (black_difficulty + 1) % len(difficulty_levels)
-                            if black_difficulty != 0:
-                                Black_AI['difficulty'] = difficulty_levels[black_difficulty]
-                                Black_AI['switch'] = True
-                                BUTTON = True
-                            else:
-                                Black_AI['switch'] = False
-                                BUTTON = True
-                    button_pressed_time = None  # Reset timer
-            time.sleep(0.25)
-    finally:
-        GPIO.cleanup() 
+                        else:
+                            White_AI['switch'] = False
+                            BUTTON = True
+                    elif game_state == 1 or game_state == 3 or game_state == 5: #If black's turn
+                        black_difficulty = (black_difficulty + 1) % len(difficulty_levels)
+                        if black_difficulty != 0:
+                            Black_AI['difficulty'] = difficulty_levels[black_difficulty]
+                            Black_AI['switch'] = True
+                            BUTTON = True
+                        else:
+                            Black_AI['switch'] = False
+                            BUTTON = True
+                button_pressed_time = None  # Reset timer
+        time.sleep(0.25)
+
 
 """
 Function to update the 8x8 led matrix
@@ -484,8 +482,7 @@ def update_matrix():
 
     except Exception as e:
         print (f"ERROR: {e}")
-    finally:
-        GPIO.cleanup()
+
 
 # game_state_dict = {
 #         "White_turn" : 0,
