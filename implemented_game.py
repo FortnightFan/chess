@@ -26,41 +26,41 @@ SWITCH_TURN = False
 game_state = 0
 
 White_Pieces = {
-    '1'         :  chess.Pawn(0,0,0,chess.board),
-    '2'         :  chess.Pawn(0,0,0,chess.board),
-    '3'         :  chess.Pawn(0,0,0,chess.board),
-    '4'         :  chess.Pawn(0,0,0,chess.board),
-    '5'         :  chess.Pawn(0,0,0,chess.board),
-    '6'         :  chess.Pawn(0,0,0,chess.board),
-    '7'         :  chess.Pawn(0,0,0,chess.board),
-    '8'         :  chess.Pawn(0,0,0,chess.board),
-    '5a255081'  :  chess.Queen(0,0,0,chess.board),
-    'b82c5e12'  :  chess.King(0,0,0,chess.board),
-    'd36db3e'   :  chess.Horse(0,0,0,chess.board),
-    '12'        :  chess.Horse(0,0,0,chess.board),
-    '1a3a9c81'  :  chess.Bishop(0,0,0,chess.board),
-    '14'        :  chess.Bishop(0,0,0,chess.board),
-    '15'        :  chess.Rook(0,0,0,chess.board),
-    '16'        :  chess.Rook(0,0,0,chess.board)
+    '42f8cf231290'          :  chess.Pawn(0,0,0,chess.board),
+    '4308cf231290'          :  chess.Pawn(0,0,0,chess.board),
+    '4318cf231290'          :  chess.Pawn(0,0,0,chess.board),
+    '4328cf231290'          :  chess.Pawn(0,0,0,chess.board),
+    '4278cf231290'          :  chess.Pawn(0,0,0,chess.board),
+    '4288cd231290'          :  chess.Pawn(0,0,0,chess.board),
+    '4298cf231290'          :  chess.Pawn(0,0,0,chess.board),
+    '42a8cf231290'          :  chess.Pawn(0,0,0,chess.board),
+    '4238cf231290'          :  chess.Queen(0,0,0,chess.board),
+    '4248cf231290'          :  chess.King(0,0,0,chess.board),
+    '4c8df231290'           :  chess.Horse(0,0,0,chess.board),
+    '42b8cf231290'          :  chess.Horse(0,0,0,chess.board),
+    '4c8df231290'           :  chess.Bishop(0,0,0,chess.board),
+    '4d8df231290'           :  chess.Bishop(0,0,0,chess.board),
+    '42d8cf231290'          :  chess.Rook(0,0,0,chess.board),
+    '42e8cf231290'          :  chess.Rook(0,0,0,chess.board)
 }
 
 Black_Pieces = {
-    '17'        :  chess.Pawn(1,0,0,chess.board),
-    '18'        :  chess.Pawn(1,0,0,chess.board),
-    '19'        :  chess.Pawn(1,0,0,chess.board),
-    '20'        :  chess.Pawn(1,0,0,chess.board),
-    '21'        :  chess.Pawn(1,0,0,chess.board),
-    '22'        :  chess.Pawn(1,0,0,chess.board),
-    '23'        :  chess.Pawn(1,0,0,chess.board),
-    '24'        :  chess.Pawn(1,0,0,chess.board),
-    '25'        :  chess.Queen(1,0,0,chess.board),
-    '6946a318'  :  chess.King(1,0,0,chess.board),
-    '27'        :  chess.Horse(1,0,0,chess.board),
-    '28'        :  chess.Horse(1,0,0,chess.board),
-    '29'        :  chess.Bishop(1,0,0,chess.board),
-    '30'        :  chess.Bishop(1,0,0,chess.board),
-    '31'        :  chess.Rook(1,0,0,chess.board),
-    '32'        :  chess.Rook(1,0,0,chess.board)
+    '4218cf231290'          :  chess.Pawn(1,0,0,chess.board),
+    '4228cf231290'          :  chess.Pawn(1,0,0,chess.board),
+    '41d8cf231290'          :  chess.Pawn(1,0,0,chess.board),
+    '41e8cf231290'          :  chess.Pawn(1,0,0,chess.board),
+    '41f8cf231290'          :  chess.Pawn(1,0,0,chess.board),
+    '4208cf231290'          :  chess.Pawn(1,0,0,chess.board),
+    '41a8cf231290'          :  chess.Pawn(1,0,0,chess.board),
+    '41b8cf231290'          :  chess.Pawn(1,0,0,chess.board),
+    '4108cf231290'          :  chess.Queen(1,0,0,chess.board),
+    '4118cf231290'          :  chess.King(1,0,0,chess.board),
+    '4168cf231290'          :  chess.Horse(1,0,0,chess.board),
+    '4178cf231290'          :  chess.Horse(1,0,0,chess.board),
+    '4e8cf231290'           :  chess.Bishop(1,0,0,chess.board),
+    '4f8cf231290'           :  chess.Bishop(1,0,0,chess.board),
+    '4188cf231290'          :  chess.Rook(1,0,0,chess.board),
+    '4198cf231290'          :  chess.Rook(1,0,0,chess.board)
 }
 
 """
@@ -178,56 +178,56 @@ def deserialize (serialized_data, reader_num):
                 print(f"Resetting port {reader_num}")
                 ser1.flush()
                 ser1.close()
-                time.sleep(.25)
+                time.sleep(.1)
                 ser1 = serial.Serial('/dev/ttyUSB0',9600,timeout=1)
                 time.sleep(.5)
             case 2:
                 print(f"Resetting port {reader_num}")
                 ser2.flush()
                 ser2.close()
-                time.sleep(.25)
+                time.sleep(.1)
                 ser2 = serial.Serial('/dev/ttyUSB1',9600,timeout=1)
                 time.sleep(.5)
             case 3:
                 print(f"Resetting port {reader_num}")
                 ser3.flush()
                 ser3.close()
-                time.sleep(.25)
+                time.sleep(.1)
                 ser3 = serial.Serial('/dev/ttyUSB2',9600,timeout=1)
                 time.sleep(.5)
             case 4:
                 print(f"Resetting port {reader_num}")
                 ser4.flush()
                 ser4.close()
-                time.sleep(.25)
+                time.sleep(.1)
                 ser4 = serial.Serial('/dev/ttyUSB3',9600,timeout=1)
                 time.sleep(.5)
             case 5:
                 print(f"Resetting port {reader_num}")
                 ser5.flush()
                 ser5.close()
-                time.sleep(.25)
+                time.sleep(.1)
                 ser5 = serial.Serial('/dev/ttyUSB4',9600,timeout=1)
                 time.sleep(.5)
             case 6:
                 print(f"Resetting port {reader_num}")
                 ser6.flush()
                 ser6.close()
-                time.sleep(.25)
+                time.sleep(.1)
                 ser6 = serial.Serial('/dev/ttyUSB5',9600,timeout=1)
                 time.sleep(.5)
             case 7:
                 print(f"Resetting port {reader_num}")
                 ser7.flush()
                 ser7.close()
-                time.sleep(.25)
+                time.sleep(.1)
                 ser7 = serial.Serial('/dev/ttyUSB6',9600,timeout=1)
                 time.sleep(.5)
             case 8:
                 print(f"Resetting port {reader_num}")
                 ser8.flush()
                 ser8.close()
-                time.sleep(.25)
+                time.sleep(.1)
                 ser8 = serial.Serial('/dev/ttyUSB7',9600,timeout=1)
                 time.sleep(.5)
         return ret_list
@@ -347,6 +347,7 @@ def read_port_6():
             
 def read_port_7():
     global reader_board_mem
+    global ser7
     time.sleep(1)
     while True:
         try:
@@ -364,6 +365,7 @@ def read_port_7():
             
 def read_port_8():
     global reader_board_mem
+    global ser8
     time.sleep(1)
     while True:
         try:
@@ -515,7 +517,9 @@ def game_control():
         match game_state:
             case 0:
                 while(True):
-                    if chess.is_white_checkmate():
+                    if chess.is_black_checkmate():
+                        print("White wins!")
+                        black_checkmate()
                         return
                     chess.clear_all_lists(chess.board)
                     chess.update_king_pos(chess.board)
@@ -528,7 +532,7 @@ def game_control():
                         1: Turn on white AI.
                     """
                     chess.clear_all_lists(chess.board)
-                    chess.check_promotions(chess.board,0)
+                    # chess.check_promotions(chess.board,0) #Commented out, will not work currently
                     if return_id == 1:
                         if White_AI['switch']:
                             game_state = 4
@@ -547,7 +551,9 @@ def game_control():
                     
             case 1:
                 while(True):
-                    if chess.is_black_checkmate():
+                    if chess.is_white_checkmate():
+                        print("Black wins!")
+                        white_checkmate()
                         return
                     chess.clear_all_lists(chess.board)
                     chess.update_king_pos(chess.board)
@@ -560,7 +566,7 @@ def game_control():
                         1: Turn on white AI.
                     """
                     chess.clear_all_lists(chess.board)
-                    chess.check_promotions(chess.board,1)
+                    # chess.check_promotions(chess.board,1)
                     if return_id == 1:
                         if Black_AI['switch']:
                             game_state = 5
@@ -868,8 +874,10 @@ def white_move_AI():
             internal_board_mem = reader_board_mem
         update_chess_positions(internal_board_mem)
         move,tup = chess.get_best_move(chess.board, 0)
-        if tup != -1:
+        if tup != -1:   #Valid best move found
             break
+        if tup == -2:   #either checkmate or stalemate occurred, exit.
+            return
         with lock:
             if BUTTON == True:
                 BUTTON = False
@@ -917,7 +925,8 @@ def black_move_AI():
         move,tup = chess.get_best_move(chess.board, 1)
         if tup != -1:
             break
-        
+        if tup == -2:   #either checkmate or stalemate occurred, exit.
+            return
         with lock:
             if BUTTON == True:
                 BUTTON = False
@@ -929,7 +938,7 @@ def black_move_AI():
                 set_leds(None)
                 return        
         
-        time.sleep(0.5)
+        time.sleep(0.25)
         
     chess.print_board(chess.board)
     print (tup)
@@ -950,25 +959,27 @@ def black_move_AI():
         time.sleep(0.25)   
 
 def white_checkmate():
-    pass
+    return
 
 def black_checkmate():
-    pass
+    return
 
 def stalemate():
     pass
 
 if __name__ == "__main__":
     ready()
-    time.sleep(3)
+    
     for i in range (0,8):
-        for j in range(0,8):
-            led_board[i][j] = 1
-            time.sleep(0.1)
-            led_board[i][j] = 0
-            time.sleep(0.1)
+        led_board[i] = 1
+        time.sleep(1)
+        led_board[i] = 0
+        time.sleep(1)
+        
     game_control()
-
-
-    pass
-
+    
+    for i in range (8,0):
+        led_board[i] = 1
+        time.sleep(1)
+        led_board[i] = 0
+        time.sleep(1)
