@@ -968,15 +968,15 @@ if __name__ == "__main__":
     ready()
     
     for i in range (0,8):
-        led_board[i] = 1
+        led_board[i] = [1,1,1,1,1,1,1,1]
         time.sleep(1)
-        led_board[i] = 0
+        led_board[i] = [0,0,0,0,0,0,0,0]
         time.sleep(1)
         
     game_control()
     
     for i in range (8,0):
-        led_board[i] = 1
+        led_board[i] = [1,1,1,1,1,1,1,1]
         time.sleep(1)
-        led_board[i] = 0
+        led_board[i] = [0,0,0,0,0,0,0,0]
         time.sleep(1)
