@@ -517,7 +517,7 @@ def game_control():
         match game_state:
             case 0:
                 while(True):
-                    if chess.is_black_checkmate():
+                    if chess.is_black_checkmate(chess.board):
                         print("White wins!")
                         black_checkmate()
                         return
@@ -551,7 +551,7 @@ def game_control():
                     
             case 1:
                 while(True):
-                    if chess.is_white_checkmate():
+                    if chess.is_white_checkmate(chess.board):
                         print("Black wins!")
                         white_checkmate()
                         return
