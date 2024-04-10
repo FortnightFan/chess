@@ -36,8 +36,8 @@ White_Pieces = {
     '42a8cf231290'          :  chess.Pawn(0,0,0,chess.board),
     '4238cf231290'          :  chess.Queen(0,0,0,chess.board),
     '4248cf231290'          :  chess.King(0,0,0,chess.board),
-    '4c8df231290'           :  chess.Horse(0,0,0,chess.board),
-    '42b8cf231290'          :  chess.Horse(0,0,0,chess.board),
+    '42b8cf231290 '         :  chess.Horse(0,0,0,chess.board),
+    '42c8cf231290 '         :  chess.Horse(0,0,0,chess.board),
     '4c8df231290'           :  chess.Bishop(0,0,0,chess.board),
     '4d8df231290'           :  chess.Bishop(0,0,0,chess.board),
     '42d8cf231290'          :  chess.Rook(0,0,0,chess.board),
@@ -460,28 +460,27 @@ def update_matrix():
     for col_pin in colPins:
         GPIO.setup(col_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    try:
-        while True:
-            # Loops through each column
-            for col in range(numCols):
+
+    while True:
+        # Loops through each column
+        for col in range(numCols):
                 # Activates the current column
-                GPIO.setup(colPins[col], GPIO.OUT)
-                GPIO.output(colPins[col], GPIO.LOW)
+            GPIO.setup(colPins[col], GPIO.OUT)
+            GPIO.output(colPins[col], GPIO.LOW)
 
-                # Loops through each row in the current column
-                for row in range(numRows):
-                    # Turn on or off the LED at the current row and column based on the display matrix
-                    GPIO.output(rowPins[row], led_board[row][col])
-                    time.sleep(0)  # Adjust this sleep as needed for brightness control (flashes with delay on)
+            # Loops through each row in the current column
+            for row in range(numRows):
+                # Turn on or off the LED at the current row and column based on the display matrix
+                GPIO.output(rowPins[row], led_board[row][col])
+                time.sleep(0)  # Adjust this sleep as needed for brightness control (flashes with delay on)
 
-                    # Turns off the LED at the current row and column
-                    GPIO.output(rowPins[row], GPIO.LOW)
+                # Turns off the LED at the current row and column
+                GPIO.output(rowPins[row], GPIO.LOW)
 
-                # Deactivate the current column for the next iteration
-                GPIO.setup(colPins[col], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+            # Deactivate the current column for the next iteration
+            GPIO.setup(colPins[col], GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-    except Exception as e:
-        print (f"ERROR: {e}")
+
 
 
 # game_state_dict = {
@@ -721,7 +720,7 @@ def white_move():
                             exit = True
                             print(f"ERROR: {e}\nResetting white move")
                             return(-1)
-                            
+            time.sleep(0.1)
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
@@ -737,7 +736,7 @@ def white_move():
         #State 3: Monitor board state, look for the lifted piece. 
         while not any(piece_ID['UID'] in sublist for sublist in temp_reader_board_mem):
             temp_reader_board_mem = reader_board_mem[:]
-            time.sleep(0.25)
+            time.sleep(0.1)
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
@@ -825,7 +824,7 @@ def black_move():
                             print(f"ERROR: {e}\nResetting black move")
                             set_leds(None)
                             return(-1)
-                            
+            time.sleep(0.1)               
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
@@ -841,7 +840,7 @@ def black_move():
         #State 3: Monitor board state, look for the lifted piece. 
         while not any(piece_ID['UID'] in sublist for sublist in temp_reader_board_mem):
             temp_reader_board_mem = reader_board_mem[:]
-            time.sleep(0.25)
+            time.sleep(0.1)
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
@@ -969,9 +968,9 @@ if __name__ == "__main__":
     
     for i in range (0,8):
         led_board[i] = [1,1,1,1,1,1,1,1]
-        time.sleep(1)
+        time.sleep(0.5)
         led_board[i] = [0,0,0,0,0,0,0,0]
-        time.sleep(1)
+        time.sleep(0.5)
         
     game_control()
     

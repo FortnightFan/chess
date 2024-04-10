@@ -1187,7 +1187,7 @@ def get_best_move(board, color):
         return (-2,-2)
     stockfish.set_fen_position(fen)
     try:
-        move = stockfish.get_best_move()
+        move = stockfish.get_best_move_time(1000) #TODO test
         return move, move_to_tuple(color, move)
     except StockfishException:
         print("ERROR in get_best_move(): StockfishException")
