@@ -87,7 +87,7 @@ class Pawn(Piece):      #Possible out of bounds issues if initialized close to t
     def find_poss_moves(self):   #returns a list of tuples that represent all possible moves.
         x, y = self.xpos, self.ypos
         if self.color == 0: #white
-            if not(self.has_moved):                                     #first move can be either 1 or 2 forward
+            if self.ypos == 6:
                 if self.board[y-2][x] == tile and self.board[y-1][x] == tile:
                     self.poss_moves.append((self.xpos,self.ypos-2))
                     self.poss_moves.append((self.xpos,self.ypos-1))    
@@ -107,7 +107,7 @@ class Pawn(Piece):      #Possible out of bounds issues if initialized close to t
                     self.poss_captures.append((x+1,y-1))
                 
         elif self.color == 1:   #black
-            if not(self.has_moved):                                     #first move can be either 1 or 2 forward
+            if self.ypos == 1:                                     #first move can be either 1 or 2 forward
                 if self.board[y+2][x] == tile and self.board[y+1][x] == tile:
                     self.poss_moves.append((self.xpos,self.ypos+2))
                     self.poss_moves.append((self.xpos,self.ypos+1))
