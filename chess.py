@@ -933,7 +933,7 @@ def is_white_checkmate(board):
             print("Calculating if checkmate. No white king present, abort.")
             return False
         king.find_poss_moves()
-        legal_king_moves(board, king)
+        legal_king_moves(board, 0)
         if king.poss_moves == [] and king.poss_captures == [] and (not can_white_block(board)):
             return True
     return False
@@ -946,7 +946,8 @@ def is_black_checkmate(board):
             print("Calculating if checkmate. No black king present, abort.")
             return False
         king.find_poss_moves()
-        legal_king_moves(board, king)
+        legal_king_moves(board, 1)
+        print(king.poss_moves)
         if king.poss_moves == [] and king.poss_captures == [] and not(can_black_block(board)):
             return True
     return False

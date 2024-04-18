@@ -538,19 +538,9 @@ def game_control():
                         else:
                             game_state = 1
                             print (f"Game state: 1")
-                            break
+                            break    
                     elif return_id == 2:
-                        return
-                    
-                    try:
-                        chess.find_all_poss_moves(chess.board)
-                        if chess.is_black_checkmate(chess.board):
-                            print("White wins!")
-                            black_checkmate()
-                            # return
-                    except Exception as e:
-                        print(f"ERROR in white_move: {e}")
-                    
+                        return                                    
             case 1:
                 while(True):
                     chess.clear_all_lists(chess.board)
@@ -582,15 +572,6 @@ def game_control():
                             break
                     elif return_id == 2:
                         return
-                    
-                    try:
-                        chess.find_all_poss_moves(chess.board)
-                        if chess.is_white_checkmate(chess.board):
-                            print("Black wins!")
-                            white_checkmate()
-                            # return
-                    except Exception as e:
-                        print(f"ERROR in black_move: {e}")
                         
             case 4:
                 while(True):
@@ -600,8 +581,8 @@ def game_control():
                         print("White wins!")
                         black_checkmate()
                         return
-                    chess.clear_all_lists()
-                    return_id = black_move_AI()
+                    chess.clear_all_lists(chess.board)
+                    return_id = white_move_AI()
                     """
                     Return values: 
                         None: Successful, switch to black's turn.
@@ -626,7 +607,7 @@ def game_control():
                         print("Black wins!")
                         white_checkmate()
                         return
-                    chess.clear_all_lists()
+                    chess.clear_all_lists(chess.board)
                     return_id = black_move_AI()
                     """
                     Return values: 
@@ -665,6 +646,7 @@ def update_chess_positions(reader_board_mem):
 def chess_piece_logic(piece, color):
     chess.clear_all_lists(chess.board)
     chess.find_all_poss_moves(chess.board)
+    chess.update_king_pos(chess.board)
     try:
         chess.legal_king_moves(chess.board, color)
         chess.check_pin(chess.board, piece)
@@ -711,14 +693,16 @@ def white_move():
     piece = chess.tile
     exit = False
     while True:
+        chess.find_all_poss_moves(chess.board)
+        chess.update_king_pos(chess.board)
         try:
             if chess.is_black_checkmate(chess.board):
                 print("White wins!")
                 black_checkmate()
-                return
+                return 2
         except Exception as e:
             print(f"ERROR in white_move: {e}")
-
+        chess.clear_all_lists(chess.board)
         #State 1: Monitor board state, check button state
         print("White_move_state 1")
         chess.print_board(chess.board)
@@ -822,6 +806,16 @@ def black_move():
     piece = chess.tile
     exit = False
     while True:
+        chess.find_all_poss_moves(chess.board)
+        chess.update_king_pos(chess.board)
+        try:
+            if chess.is_white_checkmate(chess.board):
+                print("Black wins!")
+                white_checkmate()
+                return 2
+        except Exception as e:
+            print(f"ERROR in black_move: {e}")
+        chess.clear_all_lists(chess.board)
         #State 1: Monitor board state, check button state
         print("Black_move_state 1")
         chess.print_board(chess.board)
@@ -917,6 +911,7 @@ def white_move_AI():
             return
         with lock:
             if BUTTON == True:
+                print(f"White AI: {White_AI}")
                 BUTTON = False
                 set_leds(None)
                 if not White_AI['switch']:
@@ -937,6 +932,7 @@ def white_move_AI():
     while True:
         with lock:
             if BUTTON == True:
+                print(f"White AI: {White_AI}")
                 BUTTON = False
                 if not White_AI['switch']:
                     set_leds(None)
@@ -993,7 +989,7 @@ def black_move_AI():
         with lock:
             if BUTTON == True:
                 BUTTON = False
-                print(f"White AI: {White_AI}")
+                print(f"Black AI: {Black_AI}")
                 if not Black_AI['switch']:
                     set_leds(None)
                     return (1)
