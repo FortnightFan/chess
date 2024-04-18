@@ -30,7 +30,7 @@ White_Pieces = {
     '4318cf231290'          :  chess.Pawn(0,0,0,chess.board),
     '4328cf231290'          :  chess.Pawn(0,0,0,chess.board),
     '4278cf231290'          :  chess.Pawn(0,0,0,chess.board),
-    '4288cd231290'          :  chess.Pawn(0,0,0,chess.board),
+    '4288cf231290'          :  chess.Pawn(0,0,0,chess.board),
     '4298cf231290'          :  chess.Pawn(0,0,0,chess.board),
     '42a8cf231290'          :  chess.Pawn(0,0,0,chess.board),
     '4238cf231290'          :  chess.Queen(0,0,0,chess.board),
