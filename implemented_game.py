@@ -575,13 +575,6 @@ def game_control():
                         
             case 4:
                 while(True):
-                    chess.find_all_poss_moves(chess.board)
-                    chess.update_king_pos(chess.board)
-                    if chess.is_black_checkmate(chess.board):
-                        print("White wins!")
-                        black_checkmate()
-                        return
-                    chess.clear_all_lists(chess.board)
                     return_id = white_move_AI()
                     """
                     Return values: 
@@ -598,6 +591,8 @@ def game_control():
                     elif return_id == 1:
                         game_state = 0
                         break
+                    elif return_id == 2:
+                        return
                     
             case 5:
                 while(True):
@@ -623,6 +618,8 @@ def game_control():
                     elif return_id == 1:
                         game_state = 1
                         break
+                    elif return_id == 2:
+                        return
             case 8:
                 stalemate()
 
@@ -644,7 +641,6 @@ def update_chess_positions(reader_board_mem):
                 
 #Finds all possible moves on the board specifically for a given piece.
 def chess_piece_logic(piece, color):
-    chess.clear_all_lists(chess.board)
     chess.find_all_poss_moves(chess.board)
     chess.update_king_pos(chess.board)
     try:
@@ -696,10 +692,12 @@ def white_move():
         chess.find_all_poss_moves(chess.board)
         chess.update_king_pos(chess.board)
         try:
+            print("Checking if black is in checkmate...")
             if chess.is_black_checkmate(chess.board):
                 print("White wins!")
                 black_checkmate()
                 return 2
+            print("Black is not in checkmate.")
         except Exception as e:
             print(f"ERROR in white_move: {e}")
         chess.clear_all_lists(chess.board)
@@ -809,10 +807,13 @@ def black_move():
         chess.find_all_poss_moves(chess.board)
         chess.update_king_pos(chess.board)
         try:
+            print("Checking if white is in checkmate...")
             if chess.is_white_checkmate(chess.board):
                 print("Black wins!")
                 white_checkmate()
                 return 2
+            print("White is not in checkmate.")
+
         except Exception as e:
             print(f"ERROR in black_move: {e}")
         chess.clear_all_lists(chess.board)
@@ -897,6 +898,19 @@ def white_move_AI():
     global internal_board_mem
     global game_state
     
+    update_chess_positions(reader_board_mem)
+    chess.find_all_poss_moves(chess.board)
+    chess.update_king_pos(chess.board)
+    try:
+        print("Checking if white is in checkmate...")
+        if chess.is_black_checkmate(chess.board):
+            print("White wins!")
+            black_checkmate()
+            return 2
+        print("Black is not in checkmate.")
+    except Exception as e:
+        print(f"ERROR in white_move_AI: {e}")
+        
     if White_AI['difficulty'] != 'OFF':
         chess.white_ai_skill = White_AI['difficulty']
     
@@ -951,6 +965,19 @@ def black_move_AI():
     global SWITCH_TURN
     global internal_board_mem
     global game_state
+    
+    update_chess_positions(reader_board_mem)
+    chess.find_all_poss_moves(chess.board)
+    chess.update_king_pos(chess.board)
+    try:
+        print("Checking if black is in checkmate...")
+        if chess.is_white_checkmate(chess.board):
+            print("Black wins!")
+            white_checkmate()
+            return 2
+        print("White is not in checkmate.")
+    except Exception as e:
+        print(f"ERROR in black_move_AI: {e}")
     
     if Black_AI['difficulty'] != 'OFF':
         chess.black_ai_skill = Black_AI['difficulty']
