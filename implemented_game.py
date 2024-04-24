@@ -596,13 +596,6 @@ def game_control():
                     
             case 5:
                 while(True):
-                    chess.find_all_poss_moves(chess.board)
-                    chess.update_king_pos(chess.board)
-                    if chess.is_white_checkmate(chess.board):
-                        print("Black wins!")
-                        white_checkmate()
-                        return
-                    chess.clear_all_lists(chess.board)
                     return_id = black_move_AI()
                     """
                     Return values: 

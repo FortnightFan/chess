@@ -10,10 +10,11 @@ def chess_piece_logic(piece, color):
     except Exception as e:
         print(f"ERROR in chess_piece_logic: {e}")
         
-chess.fen_to_board("rnbqk1Pr/pppp1ppp/4pn2/5b2/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+chess.fen_to_board("rnbp2Pr/ppp2ppp/4pn2/5b2/8/8/PPPPPPPP/RNBQ1BNR w - - 0 1")
 
 chess.find_all_poss_moves(chess.board)
 chess.update_king_pos(chess.board)
+print(chess.black_king_pos)
 print(chess.is_black_checkmate(chess.board))
 
 chess.print_board(chess.board)
