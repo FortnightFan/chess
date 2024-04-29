@@ -583,6 +583,20 @@ def game_control():
                         0: Update white ai difficulty
                     """
                     if return_id == None:
+                        with lock:
+                            internal_board_mem = copy.deepcopy(reader_board_mem)
+                        update_chess_positions(internal_board_mem)
+                        chess.find_all_poss_moves(chess.board)
+                        chess.update_king_pos(chess.board)
+                        try:
+                            print("Checking if black is in checkmate...")
+                            if chess.is_black_checkmate(chess.board):
+                                print("White wins!")
+                                white_checkmate()
+                                return
+                            print("White is not in checkmate.")
+                        except Exception as e:
+                            print(f"ERROR in black_move_AI: {e}")
                         if Black_AI['switch']:
                             game_state = 5
                         else:
@@ -603,6 +617,21 @@ def game_control():
                         1: Turn off black AI, switch to black's turn.
                     """
                     if return_id == None:
+                        with lock:
+                            internal_board_mem = copy.deepcopy(reader_board_mem)
+                        update_chess_positions(internal_board_mem)
+                        chess.find_all_poss_moves(chess.board)
+                        chess.update_king_pos(chess.board)
+                        try:
+                            print("Checking if white is in checkmate...")
+                            if chess.is_white_checkmate(chess.board):
+                                print("White wins!")
+                                black_checkmate()
+                                return
+                            print("White is not in checkmate.")
+                        except Exception as e:
+                            print(f"ERROR in black_move_AI: {e}")
+                            
                         if White_AI['switch']:
                             game_state = 4
                         else:
@@ -949,7 +978,7 @@ def white_move_AI():
             if SWITCH_TURN == True:
                 SWITCH_TURN = False
                 set_leds(None)
-                return
+                return 
         time.sleep(0.25)
     
     
@@ -1022,10 +1051,28 @@ def black_move_AI():
         time.sleep(0.25)   
 
 def white_checkmate():
-    return
+    global led_board
+    led_board[0] = [0, 0, 0, 1, 1, 0, 0, 0]
+    led_board[1] = [0, 0, 0, 1, 1, 0, 0, 0]
+    led_board[2] = [0, 0, 0, 1, 1, 0, 0, 0]
+    led_board[3] = [0, 0, 0, 1, 1, 0, 0, 0]
+    led_board[4] = [1, 1, 1, 1, 1, 1, 1, 1]
+    led_board[5] = [0, 1, 1, 1, 1, 1, 1, 0]
+    led_board[6] = [0, 0, 1, 1, 1, 1, 0, 0]
+    led_board[7] = [0, 0, 0, 1, 1, 0, 0, 0]
+    time.sleep(5)
 
 def black_checkmate():
-    return
+    global led_board
+    led_board[0] = [0, 0, 0, 1, 1, 0, 0, 0]
+    led_board[1] = [0, 0, 1, 1, 1, 1, 0, 0]
+    led_board[2] = [0, 1, 1, 1, 1, 1, 1, 0]
+    led_board[3] = [1, 1, 1, 1, 1, 1, 1, 1]
+    led_board[4] = [0, 0, 0, 1, 1, 0, 0, 0]
+    led_board[5] = [0, 0, 0, 1, 1, 0, 0, 0]
+    led_board[6] = [0, 0, 0, 1, 1, 0, 0, 0]
+    led_board[7] = [0, 0, 0, 1, 1, 0, 0, 0]
+    time.sleep(5)
 
 def stalemate():
     pass
@@ -1040,9 +1087,3 @@ if __name__ == "__main__":
         time.sleep(0.5)
         
     game_control()
-    
-    for i in range (8,0):
-        led_board[i] = [1,1,1,1,1,1,1,1]
-        time.sleep(1)
-        led_board[i] = [0,0,0,0,0,0,0,0]
-        time.sleep(1)
