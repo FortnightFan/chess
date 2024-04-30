@@ -5,6 +5,11 @@ import time
 import copy
 # import GPIO #dummy import for testing
 import RPi.GPIO as GPIO
+from luma.core.interface.serial import spi, noop
+from luma.core.render import canvas
+from luma.led_matrix.device import max7219
+from luma.core.legacy import text, proportional
+from luma.core.legacy.font import LCD_FONT
 
 EASY = 5
 NORMAL = 10
@@ -156,6 +161,12 @@ def ready():
     led_matrix_thread = threading.Thread(target=update_matrix)
     led_matrix_thread.daemon = True
     led_matrix_thread.start()
+
+    #8x8 matrices runner.
+    max_display_thread = threading.Thread(target=run_chess_timer)
+    max_display_thread.daemon = True
+    max_display_thread.start()
+
 
 """
 Arduino/RFID Reader Functions
@@ -433,6 +444,65 @@ def io_control():
                 button_pressed_time = None  # Reset timer
         time.sleep(0.25)
 
+"""
+Controls 8x8 matrices.
+"""
+
+global timer1, timer2, active_timer, last_button_press, device
+timer1 = 60  # Initialize timer1 with 60 seconds
+timer2 = 60  # Initialize timer2 with 60 seconds
+active_timer = None
+last_button_press = time.time()
+serial = spi(port=0, device=0, gpio=noop())
+device = max7219(serial, cascaded=4, block_orientation=-90)
+
+def handle_timer_button_press():
+    global timer1, timer2, active_timer, last_button_press
+    current_time = time.time()
+    if current_time - last_button_press < 0.1:  # Debounce manually
+        return
+    last_button_press = current_time
+
+    if active_timer is None:
+        timer1 = 60
+        active_timer = 1
+    elif active_timer == 1:
+        if timer2 is None:
+            timer2 = 60
+        active_timer = 2
+    else:
+        active_timer = 1
+
+def display_message(device, message):
+    text_width = len(message) * 8  
+        # Calculate the starting position to center the text
+    start_pos = max((device.width - text_width) // 2, 0)
+        # Display the centered text
+    with canvas(device) as draw:
+        text(draw, (start_pos, 0), message, fill="white", font=proportional(LCD_FONT))
+
+def run_chess_timer():
+    global timer1, timer2, active_timer, last_button_press, device
+    display_message(device, "CHESS")
+
+    # Main program loop
+    while timer1 > 0 and timer2 > 0:
+        time.sleep(1)
+        if active_timer == 1:
+            timer1 -= 1
+            display_message(device, f"W: {timer1}")
+        elif active_timer == 2:
+            timer2 -= 1
+            display_message(device, f"B: {timer2}")
+
+    if timer1 <= 0:
+        winner = "White wins!"
+    elif timer2 <= 0:
+        winner = "Black wins!"
+
+    display_message(device, winner)
+    time.sleep(10)
+    GPIO.cleanup()
 
 """
 Function to update the 8x8 led matrix
@@ -734,10 +804,13 @@ def white_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
+                    handle_timer_button_press()
                     SWITCH_TURN = False
+                    set_leds(None)
                     return 0
                 if BUTTON == True:
                     BUTTON = False
+                    set_leds(None)
                     return 1
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
@@ -769,6 +842,7 @@ def white_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
+                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -785,6 +859,7 @@ def white_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
+                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -850,10 +925,13 @@ def black_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
+                    handle_timer_button_press()
                     SWITCH_TURN = False
+                    set_leds(None)
                     return 0
                 if BUTTON == True:
                     BUTTON = False
+                    set_leds(None)
                     return 1
                 
         #State 2: Loop and find the lifted piece. Run chess logic and display on the lights.
@@ -886,6 +964,7 @@ def black_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
+                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -902,6 +981,7 @@ def black_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
+                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -955,6 +1035,7 @@ def white_move_AI():
                 else:
                     return (0)
             if SWITCH_TURN == True:
+                handle_timer_button_press()
                 SWITCH_TURN = False
                 set_leds(None)
                 return
@@ -976,6 +1057,7 @@ def white_move_AI():
                 else:
                     return (0)
             if SWITCH_TURN == True:
+                handle_timer_button_press()
                 SWITCH_TURN = False
                 set_leds(None)
                 return 
@@ -1023,6 +1105,7 @@ def black_move_AI():
                 else:
                     return (0)
             if SWITCH_TURN == True:
+                handle_timer_button_press()
                 SWITCH_TURN = False
                 set_leds(None)
                 return        
@@ -1045,6 +1128,7 @@ def black_move_AI():
                 else:
                     return (0)
             if SWITCH_TURN == True:
+                handle_timer_button_press()
                 SWITCH_TURN = False
                 set_leds(None)
                 return
