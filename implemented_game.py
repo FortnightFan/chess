@@ -694,7 +694,7 @@ def game_control():
                         try:
                             print("Checking if white is in checkmate...")
                             if chess.is_white_checkmate(chess.board):
-                                print("White wins!")
+                                print("Black wins!")
                                 black_checkmate()
                                 return
                             print("White is not in checkmate.")
@@ -786,7 +786,7 @@ def white_move():
             print("Checking if black is in checkmate...")
             if chess.is_black_checkmate(chess.board):
                 print("White wins!")
-                black_checkmate()
+                white_checkmate()
                 return 2
             print("Black is not in checkmate.")
         except Exception as e:
@@ -906,7 +906,7 @@ def black_move():
             print("Checking if white is in checkmate...")
             if chess.is_white_checkmate(chess.board):
                 print("Black wins!")
-                white_checkmate()
+                black_checkmate()
                 return 2
             print("White is not in checkmate.")
 
@@ -1006,7 +1006,7 @@ def white_move_AI():
         print("Checking if white is in checkmate...")
         if chess.is_black_checkmate(chess.board):
             print("White wins!")
-            black_checkmate()
+            white_checkmate()
             return 2
         print("Black is not in checkmate.")
     except Exception as e:
@@ -1076,7 +1076,7 @@ def black_move_AI():
         print("Checking if black is in checkmate...")
         if chess.is_white_checkmate(chess.board):
             print("Black wins!")
-            white_checkmate()
+            black_checkmate()
             return 2
         print("White is not in checkmate.")
     except Exception as e:
