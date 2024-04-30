@@ -704,7 +704,7 @@ def game_control():
                         if White_AI['switch']:
                             game_state = 4
                         else:
-                            game_state = 2
+                            game_state = 0
                         break            
                     elif return_id == 1:
                         game_state = 1
