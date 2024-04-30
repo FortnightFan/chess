@@ -5,11 +5,11 @@ import time
 import copy
 # import GPIO #dummy import for testing
 import RPi.GPIO as GPIO
-# from luma.core.interface.serial import spi, noop
-# from luma.led_matrix.device import max7219
-# from luma.core.render import canvas
-# from luma.core.legacy import text
-# from luma.core.legacy.font import proportional, LCD_FONT
+from luma.core.interface.serial import spi, noop
+from luma.led_matrix.device import max7219
+from luma.core.render import canvas
+from luma.core.legacy import text
+from luma.core.legacy.font import proportional, LCD_FONT
 EASY = 5
 NORMAL = 10
 HARD = 18
