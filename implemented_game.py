@@ -803,7 +803,6 @@ def white_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
-                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -841,7 +840,6 @@ def white_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
-                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -858,7 +856,6 @@ def white_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
-                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -924,7 +921,6 @@ def black_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
-                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -963,7 +959,6 @@ def black_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
-                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -980,7 +975,6 @@ def black_move():
             #If button is pressed, return.
             with lock:
                 if SWITCH_TURN == True:
-                    handle_timer_button_press()
                     SWITCH_TURN = False
                     set_leds(None)
                     return 0
@@ -1034,7 +1028,6 @@ def white_move_AI():
                 else:
                     return (0)
             if SWITCH_TURN == True:
-                handle_timer_button_press()
                 SWITCH_TURN = False
                 set_leds(None)
                 return
@@ -1056,7 +1049,6 @@ def white_move_AI():
                 else:
                     return (0)
             if SWITCH_TURN == True:
-                handle_timer_button_press()
                 SWITCH_TURN = False
                 set_leds(None)
                 return 
@@ -1104,7 +1096,6 @@ def black_move_AI():
                 else:
                     return (0)
             if SWITCH_TURN == True:
-                handle_timer_button_press()
                 SWITCH_TURN = False
                 set_leds(None)
                 return        
@@ -1127,7 +1118,6 @@ def black_move_AI():
                 else:
                     return (0)
             if SWITCH_TURN == True:
-                handle_timer_button_press()
                 SWITCH_TURN = False
                 set_leds(None)
                 return
