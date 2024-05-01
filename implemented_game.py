@@ -5,11 +5,11 @@ import time
 import copy
 # import GPIO #dummy import for testing
 import RPi.GPIO as GPIO
-from luma.core.interface.serial import spi, noop
-from luma.led_matrix.device import max7219
-from luma.core.render import canvas
-from luma.core.legacy import text
-from luma.core.legacy.font import proportional, LCD_FONT
+# from luma.core.interface.serial import spi, noop
+# from luma.led_matrix.device import max7219
+# from luma.core.render import canvas
+# from luma.core.legacy import text
+# from luma.core.legacy.font import proportional, LCD_FONT
 EASY = 5
 NORMAL = 10
 HARD = 18
@@ -162,9 +162,9 @@ def ready():
     led_matrix_thread.start()
 
     #8x8 matrices runner.
-    max_display_thread = threading.Thread(target=run_chess_timer)
-    max_display_thread.daemon = True
-    max_display_thread.start()
+    # max_display_thread = threading.Thread(target=run_chess_timer)
+    # max_display_thread.daemon = True
+    # max_display_thread.start()
 
 
 """
@@ -452,8 +452,8 @@ timer1 = 60  # Initialize timer1 with 60 seconds
 timer2 = 60  # Initialize timer2 with 60 seconds
 active_timer = None
 last_button_press = time.time()
-serial = spi(port=0, device=0, gpio=noop())
-device = max7219(serial, cascaded=4, block_orientation=-90)
+# serial = spi(port=0, device=0, gpio=noop())
+# device = max7219(serial, cascaded=4, block_orientation=-90)
 
 def handle_timer_button_press():
     global timer1, timer2, active_timer, last_button_press
