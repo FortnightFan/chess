@@ -18,10 +18,11 @@ try:
     usb.util.dispose_resources(bottom_hub)
     print("Hubs detached.")
     
-    time.sleep(3) 
+    time.sleep(1) 
     
     top_hub.set_configuration()
     usb.util.claim_interface(top_hub, 0)
+    time.sleep(1) 
     bottom_hub.set_configuration()
     usb.util.claim_interface(bottom_hub, 0)
 
