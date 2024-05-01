@@ -15,7 +15,7 @@ device = max7219(serial, cascaded=4, block_orientation=-90)
 timer1 = 60  # Initialize timer1 with 60 seconds
 timer2 = 60  # Initialize timer2 with 60 seconds
 active_timer = None
-last_button_press = time()
+last_button_press = time.time()
 
     # Callback function for button press
 def handle_button_press(channel):
