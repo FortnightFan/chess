@@ -18,7 +18,7 @@ active_timer = None
 last_button_press = time()
 
     # Callback function for button press
-def handle_button_press():
+def handle_button_press(channel):
     global timer1, timer2, active_timer, last_button_press
     current_time = time.time()
     if current_time - last_button_press < 0.1:  # Debounce manually
@@ -49,6 +49,7 @@ def display_message(device, message):
         text(draw, (start_pos, 0), message, fill="white", font=proportional(LCD_FONT))
 
 def run_chess_timer():
+    global timer1, timer2, active_timer
     # Function to setup GPIO pin for button input
     def setup_gpio(button_pin):
         GPIO.setmode(GPIO.BCM)
@@ -74,7 +75,7 @@ def run_chess_timer():
         elif active_timer == 2:
             timer2 -= 1
             display_message(device, f"B: {timer2}")
-    winner = "Black wins!" if timer1 <= 0 else "White wins!"
+    winner = "B wins!" if timer1 <= 0 else "W wins!"
     display_message(device, winner)
     time.sleep(10)
     GPIO.cleanup()  # Clean up GPIO to ensure a proper shutdown
