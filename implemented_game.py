@@ -742,12 +742,15 @@ def chess_piece_logic(piece, color):
 
 def set_leds(tuples_list):
     global led_board
-    if tuples_list == None:
-        led_board = [[0 for _ in range(8)] for _ in range(8)]
-    else:
-        for i in range (0,len(tuples_list)):
-            x,y = tuples_list[i]    
-            led_board[7-y][7-x] = 1 
+    try:
+        if tuples_list == None:
+            led_board = [[0 for _ in range(8)] for _ in range(8)]
+        else:
+            for i in range (0,len(tuples_list)):
+                x,y = tuples_list[i]    
+                led_board[7-y][7-x] = 1 
+    except Exception as e:
+        print(f"ERROR in set_leds(): {e}")
 lock = threading.Lock()
 """
 Game-state functions
@@ -1047,9 +1050,22 @@ def white_move_AI():
                     set_leds(None)
                     return (1)
                 else:
+                    set_leds(None)
                     return (0)
             if SWITCH_TURN == True:
                 SWITCH_TURN = False
+                update_chess_positions(reader_board_mem)
+                chess.find_all_poss_moves(chess.board)
+                chess.update_king_pos(chess.board)
+                try:
+                    print("Checking if white is in checkmate...")
+                    if chess.is_black_checkmate(chess.board):
+                        print("White wins!")
+                        white_checkmate()
+                        return 2
+                    print("Black is not in checkmate.")
+                except Exception as e:
+                    print(f"ERROR in white_move_AI: {e}")
                 set_leds(None)
                 return 
         time.sleep(0.25)
@@ -1094,6 +1110,7 @@ def black_move_AI():
                     set_leds(None)
                     return (1)
                 else:
+                    set_leds(None)
                     return (0)
             if SWITCH_TURN == True:
                 SWITCH_TURN = False
@@ -1119,6 +1136,18 @@ def black_move_AI():
                     return (0)
             if SWITCH_TURN == True:
                 SWITCH_TURN = False
+                update_chess_positions(reader_board_mem)
+                chess.find_all_poss_moves(chess.board)
+                chess.update_king_pos(chess.board)
+                try:
+                    print("Checking if black is in checkmate...")
+                    if chess.is_white_checkmate(chess.board):
+                        print("Black wins!")
+                        black_checkmate()
+                        return 2
+                    print("White is not in checkmate.")
+                except Exception as e:
+                    print(f"ERROR in black_move_AI: {e}")
                 set_leds(None)
                 return
         time.sleep(0.25)   
